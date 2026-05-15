@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home — Company</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body data-page="home">
+    <header class="site-header">
+      <div class="inner">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span data-bind="company-name">Company</span>
+        </a>
+        <nav class="nav-desktop" aria-label="Primary">
+          <a data-nav="home" href="/index.html">Home</a>
+          <a data-nav="about" href="/about.html">About</a>
+          <a data-nav="services" href="/services.html">Services</a>
+          <a data-nav="team" href="/team.html">Team</a>
+          <a data-nav="contact" href="/contact.html">Contact</a>
+        </nav>
+        <div class="nav-cta">
+          <a class="btn btn-primary" href="/contact.html">Start a project</a>
+          <button type="button" class="menu-toggle" aria-label="Open menu">
+            <span></span>
+          </button>
+        </div>
+      </div>
+      <nav class="nav-mobile" aria-label="Mobile">
+        <a data-nav="home" href="/index.html">Home</a>
+        <a data-nav="about" href="/about.html">About</a>
+        <a data-nav="services" href="/services.html">Services</a>
+        <a data-nav="team" href="/team.html">Team</a>
+        <a data-nav="contact" href="/contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="home-hero" aria-busy="true"></section>
+
+      <section class="section" id="home-banners"></section>
+
+      <section class="section" id="home-services"></section>
+
+      <section class="section" id="home-about"></section>
+
+      <section class="section" id="home-team"></section>
+
+      <section class="section">
+        <div class="container contact-section">
+          <div>
+            <h2>Ready when you are</h2>
+            <p style="color: var(--muted); max-width: 48ch; margin: 0">
+              Tell us about your goals—we will follow up with next steps and a clear scope proposal.
+            </p>
+          </div>
+          <div class="contact-card">
+            <h3 style="margin-top: 0">Quick message</h3>
+            <form id="contact-form-mini">
+              <div class="form-group">
+                <label for="m-name">Name</label>
+                <input id="m-name" name="name" required minlength="2" maxlength="120" autocomplete="name" />
+              </div>
+              <div class="form-group">
+                <label for="m-email">Email</label>
+                <input
+                  id="m-email"
+                  name="email"
+                  type="email"
+                  required
+                  maxlength="120"
+                  autocomplete="email"
+                />
+              </div>
+              <div class="form-group">
+                <label for="m-msg">Message</label>
+                <textarea id="m-msg" name="message" required minlength="10" maxlength="4000"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Send</button>
+              <input type="hidden" name="phone" value="" />
+            </form>
+            <p id="mini-status" class="form-status" role="status"></p>
+            <p style="margin: 0.75rem 0 0; font-size: 0.88rem">
+              <a href="/contact.html" style="color: var(--accent); font-weight: 600">Full contact form →</a>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="brand" style="margin-bottom: 0.5rem">
+              <span class="brand-mark" aria-hidden="true"></span>
+              <strong data-bind="company-name">Company</strong>
+            </div>
+            <p>Strategy, design, and engineering for teams that care about quality.</p>
+          </div>
+          <div class="footer-col">
+            <h4>Explore</h4>
+            <ul>
+              <li><a href="/about.html">About</a></li>
+              <li><a href="/services.html">Services</a></li>
+              <li><a href="/team.html">Team</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Admin</h4>
+            <ul>
+              <li><a href="/admin/">Content admin</a></li>
+              <li><a href="/contact.html">Contact</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span data-bind="footer-tagline">Footer</span>
+          <span>Performance-first · Secure defaults</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/js/shell.js"></script>
+    <script src="/js/home.js"></script>
+    <script>
+      (function () {
+        document.addEventListener("DOMContentLoaded", function () {
+          var form = document.getElementById("contact-form-mini");
+          var status = document.getElementById("mini-status");
+          if (!form) return;
+          form.addEventListener("submit", async function (e) {
+            e.preventDefault();
+            status.textContent = "";
+            status.className = "form-status";
+            var fd = new FormData(form);
+            try {
+              var r = await fetch("/api/public/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  name: fd.get("name"),
+                  email: fd.get("email"),
+                  phone: "",
+                  message: fd.get("message"),
+                }),
+              });
+              var j = await r.json();
+              if (!j.ok) {
+                status.textContent = j.error || "Error.";
+                status.classList.add("err");
+                return;
+              }
+              status.textContent = "Sent! We will reply soon.";
+              status.classList.add("ok");
+              form.reset();
+            } catch {
+              status.textContent = "Network error.";
+              status.classList.add("err");
+            }
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>

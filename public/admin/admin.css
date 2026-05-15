@@ -1,0 +1,257 @@
+:root {
+  --bg: #0c1017;
+  --surface: #141a24;
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #e7edf6;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --danger: #f87171;
+  --ok: #4ade80;
+  --radius: 12px;
+  --font: "DM Sans", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+.muted {
+  color: var(--muted);
+}
+.hidden {
+  display: none !important;
+}
+.panel {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+.login-card {
+  width: min(420px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+}
+.login-card h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+.login-card label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+input,
+textarea,
+button {
+  font: inherit;
+  color: inherit;
+}
+.login-card input {
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #0f141c;
+}
+.err {
+  color: var(--danger);
+  min-height: 1.2em;
+  font-size: 0.9rem;
+}
+.hint {
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+a {
+  color: var(--accent);
+}
+
+.topbar {
+  border-bottom: 1px solid var(--border);
+  background: rgba(15, 20, 28, 0.92);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(12px);
+}
+.topbar-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  flex: 1;
+}
+.tab {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.tab.active {
+  background: rgba(56, 189, 248, 0.15);
+  color: var(--text);
+  border-color: rgba(56, 189, 248, 0.35);
+}
+.top-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 3rem;
+}
+.tab-panel h2 {
+  margin-top: 0;
+}
+.grid-form {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 720px;
+}
+.grid-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+.grid-form input,
+.grid-form textarea {
+  padding: 0.55rem 0.65rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+.row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+@media (max-width: 640px) {
+  .row-2 {
+    grid-template-columns: 1fr;
+  }
+}
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1rem 0;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: #1a2230;
+  color: var(--text);
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn.primary {
+  background: linear-gradient(135deg, #38bdf8, #818cf8);
+  color: #081018;
+  border-color: transparent;
+}
+.btn.ghost {
+  background: transparent;
+}
+.btn.sm {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+.btn.danger {
+  border-color: rgba(248, 113, 113, 0.5);
+  color: #fecaca;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  background: var(--surface);
+}
+.card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+.mini-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  margin-bottom: 0.5rem;
+}
+.mini-form input,
+.mini-form textarea {
+  padding: 0.45rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #0f141c;
+}
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.35rem;
+}
+.status {
+  min-height: 1.25em;
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+}
+.status.ok {
+  color: var(--ok);
+}
+.status.err {
+  color: var(--danger);
+}
+
+.msg-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.msg-body {
+  white-space: pre-wrap;
+  font-size: 0.92rem;
+  margin: 0;
+}
+.unread {
+  border-color: rgba(56, 189, 248, 0.45);
+}

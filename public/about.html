@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About — Company</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body data-page="about">
+    <header class="site-header">
+      <div class="inner">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span data-bind="company-name">Company</span>
+        </a>
+        <nav class="nav-desktop" aria-label="Primary">
+          <a data-nav="home" href="/index.html">Home</a>
+          <a data-nav="about" href="/about.html">About</a>
+          <a data-nav="services" href="/services.html">Services</a>
+          <a data-nav="team" href="/team.html">Team</a>
+          <a data-nav="contact" href="/contact.html">Contact</a>
+        </nav>
+        <div class="nav-cta">
+          <a class="btn btn-primary" href="/contact.html">Start a project</a>
+          <button type="button" class="menu-toggle" aria-label="Open menu"><span></span></button>
+        </div>
+      </div>
+      <nav class="nav-mobile" aria-label="Mobile">
+        <a data-nav="home" href="/index.html">Home</a>
+        <a data-nav="about" href="/about.html">About</a>
+        <a data-nav="services" href="/services.html">Services</a>
+        <a data-nav="team" href="/team.html">Team</a>
+        <a data-nav="contact" href="/contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <header class="page-hero">
+        <h1>About us</h1>
+        <p class="lead">How we work, what we optimize for, and why teams partner with us.</p>
+      </header>
+      <div id="about-dynamic" class="section" style="padding-top: 0"></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-grid">
+          <div class="footer-brand">
+            <div class="brand" style="margin-bottom: 0.5rem">
+              <span class="brand-mark" aria-hidden="true"></span>
+              <strong data-bind="company-name">Company</strong>
+            </div>
+            <p>Strategy, design, and engineering for teams that care about quality.</p>
+          </div>
+          <div class="footer-col">
+            <h4>Explore</h4>
+            <ul>
+              <li><a href="/services.html">Services</a></li>
+              <li><a href="/team.html">Team</a></li>
+              <li><a href="/contact.html">Contact</a></li>
+            </ul>
+          </div>
+          <div class="footer-col">
+            <h4>Admin</h4>
+            <ul>
+              <li><a href="/admin/">Content admin</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <span data-bind="footer-tagline">Footer</span>
+          <span>Performance-first · Secure defaults</span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/js/shell.js"></script>
+    <script src="/js/about.js"></script>
+  </body>
+</html>

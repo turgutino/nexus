@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Service — Company</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body data-page="services">
+    <header class="site-header">
+      <div class="inner">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span data-bind="company-name">Company</span>
+        </a>
+        <nav class="nav-desktop" aria-label="Primary">
+          <a data-nav="home" href="/index.html">Home</a>
+          <a data-nav="about" href="/about.html">About</a>
+          <a data-nav="services" href="/services.html">Services</a>
+          <a data-nav="team" href="/team.html">Team</a>
+          <a data-nav="contact" href="/contact.html">Contact</a>
+        </nav>
+        <div class="nav-cta">
+          <a class="btn btn-primary" href="/contact.html">Start a project</a>
+          <button type="button" class="menu-toggle" aria-label="Open menu"><span></span></button>
+        </div>
+      </div>
+      <nav class="nav-mobile" aria-label="Mobile">
+        <a data-nav="home" href="/index.html">Home</a>
+        <a data-nav="about" href="/about.html">About</a>
+        <a data-nav="services" href="/services.html">Services</a>
+        <a data-nav="team" href="/team.html">Team</a>
+        <a data-nav="contact" href="/contact.html">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <header class="page-hero">
+        <p class="lead" style="margin-bottom: 0.5rem">
+          <a href="/services.html" style="color: var(--accent); font-weight: 600">← All services</a>
+        </p>
+        <h1>Service detail</h1>
+      </header>
+      <div id="service-detail"></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-bottom" style="margin-top: 0; padding-top: 0; border: 0">
+          <span data-bind="footer-tagline">Footer</span>
+          <span><a href="/services.html">Services</a></span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/js/shell.js"></script>
+    <script src="/js/service-detail.js"></script>
+  </body>
+</html>

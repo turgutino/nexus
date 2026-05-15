@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Content admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/admin/admin.css" />
+  </head>
+  <body>
+    <div id="view-login" class="panel">
+      <div class="login-card">
+        <h1>Content admin</h1>
+        <p class="muted">Sign in to manage site content.</p>
+        <form id="login-form">
+          <label>Username <input name="username" autocomplete="username" required /></label>
+          <label>Password <input name="password" type="password" autocomplete="current-password" required /></label>
+          <button type="submit" class="btn primary">Sign in</button>
+        </form>
+        <p id="login-err" class="err"></p>
+        <p class="hint muted">Demo: admin / admin123 — set ADMIN_PASSWORD and SESSION_SECRET for production.</p>
+        <p><a href="/index.html" class="muted">← Back to site</a></p>
+      </div>
+    </div>
+
+    <div id="view-app" class="hidden">
+      <header class="topbar">
+        <div class="topbar-inner">
+          <strong>Admin</strong>
+          <nav class="tabs" id="nav-tabs">
+            <button type="button" data-tab="site" class="tab active">Homepage</button>
+            <button type="button" data-tab="banners" class="tab">Banners</button>
+            <button type="button" data-tab="services" class="tab">Services</button>
+            <button type="button" data-tab="team" class="tab">Team</button>
+            <button type="button" data-tab="messages" class="tab">Messages</button>
+          </nav>
+          <div class="top-actions">
+            <a href="/index.html" class="btn ghost sm">View site</a>
+            <button type="button" id="btn-logout" class="btn ghost sm">Logout</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        <p id="global-status" class="status" role="status"></p>
+
+        <section id="tab-site" class="tab-panel">
+          <h2>Homepage & global copy</h2>
+          <form id="form-site" class="grid-form">
+            <label>Company name <input name="company_name" /></label>
+            <label>Footer tagline <input name="footer_tagline" /></label>
+            <label>Hero title <input name="hero_title" /></label>
+            <label>Hero subtitle <textarea name="hero_subtitle" rows="3"></textarea></label>
+            <label>Hero image URL <input name="hero_image" placeholder="/uploads/..." /></label>
+            <div class="row-2">
+              <label>Primary CTA text <input name="hero_cta_primary_text" /></label>
+              <label>Primary CTA link <input name="hero_cta_primary_link" /></label>
+            </div>
+            <div class="row-2">
+              <label>Secondary CTA text <input name="hero_cta_secondary_text" /></label>
+              <label>Secondary CTA link <input name="hero_cta_secondary_link" /></label>
+            </div>
+            <label>Home “About” title <input name="home_about_title" /></label>
+            <label>Home “About” text <textarea name="home_about_text" rows="4"></textarea></label>
+            <label>Home “About” image URL <input name="home_about_image" /></label>
+            <hr />
+            <label>About page title <input name="about_page_title" /></label>
+            <label>About page lead <textarea name="about_page_lead" rows="2"></textarea></label>
+            <label>About page body <textarea name="about_page_body" rows="8"></textarea></label>
+            <label>Mission <textarea name="about_mission" rows="3"></textarea></label>
+            <label>Values <textarea name="about_values" rows="3"></textarea></label>
+            <button type="submit" class="btn primary">Save homepage</button>
+          </form>
+        </section>
+
+        <section id="tab-banners" class="tab-panel hidden">
+          <h2>Homepage banners</h2>
+          <p class="muted">Up to six cards. Use image URLs from uploads or external CDN.</p>
+          <div id="banners-list" class="stack"></div>
+          <button type="button" id="banner-add" class="btn ghost">Add banner</button>
+          <button type="button" id="banners-save" class="btn primary">Save banners</button>
+        </section>
+
+        <section id="tab-services" class="tab-panel hidden">
+          <h2>Services</h2>
+          <div id="services-list-admin" class="stack"></div>
+          <button type="button" id="service-new" class="btn primary">New service</button>
+        </section>
+
+        <section id="tab-team" class="tab-panel hidden">
+          <h2>Team members</h2>
+          <div id="team-list-admin" class="stack"></div>
+          <button type="button" id="team-new" class="btn primary">New member</button>
+        </section>
+
+        <section id="tab-messages" class="tab-panel hidden">
+          <h2>Contact messages</h2>
+          <div id="messages-list" class="stack"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/admin/admin.js"></script>
+  </body>
+</html>
