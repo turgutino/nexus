@@ -1,6 +1,62 @@
+# Dependencies
 node_modules/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pem
+*.p12
+
+# Runtime data (legacy SQLite path used by import script)
 data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded user content (keep directory with .gitkeep)
 public/uploads/*
 !public/uploads/.gitkeep
-.env
+
+# Logs and debug
+logs/
+*.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor and IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Test / coverage (if added later)
+coverage/
+.nyc_output/
+*.lcov
+
+# Build / dist (if added later)
+dist/
+build/
+out/
+.cache/
+
+# Temp files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Misc
+.eslintcache
