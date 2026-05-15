@@ -2,6 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact — Company</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -20,63 +22,80 @@
           <span data-bind="company-name">Company</span>
         </a>
         <nav class="nav-desktop" aria-label="Primary">
-          <a data-nav="home" href="/index.html">Home</a>
-          <a data-nav="about" href="/about.html">About</a>
-          <a data-nav="services" href="/services.html">Services</a>
-          <a data-nav="team" href="/team.html">Team</a>
-          <a data-nav="contact" href="/contact.html">Contact</a>
+          <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+          <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+          <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+          <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+          <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+          <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+          <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
         </nav>
         <div class="nav-cta">
-          <a class="btn btn-primary" href="/contact.html">Start a project</a>
-          <button type="button" class="menu-toggle" aria-label="Open menu"><span></span></button>
+          <a class="btn btn-primary" href="/contact.html" data-i18n="nav.cta_project">Start a project</a>
+          <button type="button" class="menu-toggle" data-i18n-aria="nav.menu_aria" data-i18n-fallback="Open menu" aria-label="Open menu"><span></span></button>
         </div>
       </div>
       <nav class="nav-mobile" aria-label="Mobile">
-        <a data-nav="home" href="/index.html">Home</a>
-        <a data-nav="about" href="/about.html">About</a>
-        <a data-nav="services" href="/services.html">Services</a>
-        <a data-nav="team" href="/team.html">Team</a>
-        <a data-nav="contact" href="/contact.html">Contact</a>
+        <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+        <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+        <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+        <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+        <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+        <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+        <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
       </nav>
     </header>
 
     <main class="container">
       <header class="page-hero">
-        <h1>Contact</h1>
-        <p class="lead">
+        <h1 data-i18n="contact.page_title">Contact</h1>
+        <p class="lead" data-i18n="contact.page_lead">
           Share context, timeline, and goals. We respond within two business days with suggested next steps.
         </p>
       </header>
 
       <section class="section contact-section" style="padding-top: 0">
-        <div class="contact-card">
-          <h3 style="margin-top: 0">Office hours</h3>
-          <ul class="list-check">
-            <li>Remote-first, time zones: Americas · EU</li>
-            <li>Secure file sharing available on request</li>
-            <li>No spam—your note stays with our core team</li>
-          </ul>
+        <div>
+          <div class="contact-card">
+            <h3 style="margin-top: 0" data-i18n="contact.map">Map</h3>
+            <div id="contact-map" class="map-embed-wrap" aria-hidden="true"></div>
+            <p class="muted" style="font-size: 0.88rem; margin-top: 0.75rem" data-i18n="contact.map_note">
+              Embed URL is configurable in the admin panel.
+            </p>
+          </div>
+          <div class="contact-card" style="margin-top: 1rem">
+            <h3 style="margin-top: 0" data-i18n="contact.hours">Office hours</h3>
+            <ul class="list-check">
+              <li data-i18n="contact.hours_remote">Remote-first, time zones: Americas · EU</li>
+              <li data-i18n="contact.hours_files">Secure file sharing available on request</li>
+              <li data-i18n="contact.hours_spam">No spam—your note stays with our core team</li>
+            </ul>
+          </div>
         </div>
         <div class="contact-card">
-          <h3 style="margin-top: 0">Send a message</h3>
+          <h3 style="margin-top: 0" data-i18n="contact.form_title">Send a message</h3>
           <form id="contact-form">
             <div class="form-group">
-              <label for="name">Name</label>
+              <label for="name" data-i18n="form.name">Name</label>
               <input id="name" name="name" required minlength="2" maxlength="120" autocomplete="name" />
             </div>
             <div class="form-group">
-              <label for="email">Email</label>
+              <label for="email" data-i18n="form.email">Email</label>
               <input id="email" name="email" type="email" required maxlength="120" autocomplete="email" />
             </div>
             <div class="form-group">
-              <label for="phone">Phone (optional)</label>
+              <label for="phone" data-i18n="form.phone">Phone (optional)</label>
               <input id="phone" name="phone" maxlength="40" autocomplete="tel" />
             </div>
             <div class="form-group">
-              <label for="message">How can we help?</label>
+              <label for="message" data-i18n="form.message_prompt">How can we help?</label>
               <textarea id="message" name="message" required minlength="10" maxlength="4000"></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <div class="form-group">
+              <label for="attachment" data-i18n="form.attachment">Attachment (optional — images, PDF, Word, max 5MB)</label>
+              <input id="attachment" name="attachment" type="file" accept=".pdf,.doc,.docx,image/*" />
+            </div>
+            <button type="submit" class="btn btn-primary" data-i18n="form.submit">Submit</button>
           </form>
           <p id="contact-status" class="form-status" role="status"></p>
         </div>
@@ -85,14 +104,36 @@
 
     <footer class="site-footer">
       <div class="container">
+        <div class="footer-newsletter" aria-labelledby="newsletter-heading">
+          <p id="newsletter-heading" class="footer-newsletter-title">Newsletter</p>
+          <p class="footer-newsletter-lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
+          <form class="footer-newsletter-form" id="newsletter-form">
+            <input
+              type="email"
+              id="newsletter-email"
+              name="email"
+              required
+              placeholder="you@example.com"
+              autocomplete="email"
+              maxlength="254"
+              aria-label="Email for newsletter"
+            />
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+          <p id="newsletter-status" class="form-status footer-newsletter-status" role="status"></p>
+        </div>
         <div class="footer-bottom" style="margin-top: 0; padding-top: 0; border: 0">
           <span data-bind="footer-tagline">Footer</span>
-          <span><a href="/index.html">Home</a></span>
+          <span><a href="/index.html" data-i18n="nav.home">Home</a></span>
         </div>
       </div>
     </footer>
 
+    <script src="/js/i18n.js"></script>
+    <script src="/js/cookie-consent.js"></script>
     <script src="/js/shell.js"></script>
+    <script src="/js/newsletter-footer.js"></script>
+    <script src="/js/seo.js"></script>
     <script src="/js/contact.js"></script>
   </body>
 </html>

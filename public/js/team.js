@@ -7,13 +7,9 @@
       .replace(/"/g, "&quot;");
   }
 
-  function avatar(url) {
-    if (url) return `<img src="${escapeHtml(url)}" alt="" loading="lazy" />`;
-    return `<div style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:2rem;height:100%">◆</div>`;
-  }
-
   async function load() {
     await SiteShell.initShell();
+    if (window.SiteI18n) window.SiteI18n.applyDom(document);
     const root = document.getElementById("team-grid");
     if (!root) return;
     const r = await fetch("/api/public/team");
@@ -32,6 +28,15 @@
       </article>`
       )
       .join("");
+  }
+
+  function avatar(url) {
+    if (url) return `<img src="${escapeHtml(url)}" alt="" loading="lazy" />`;
+    return `<div style="display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:2rem;height:100%">◆</div>`;
+  }
+
+  if (window.SiteI18n) {
+    window.addEventListener(window.SiteI18n.LOCALE_EVENT, load);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", load);

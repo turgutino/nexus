@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
     <title>Home — Company</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,25 +22,29 @@
           <span data-bind="company-name">Company</span>
         </a>
         <nav class="nav-desktop" aria-label="Primary">
-          <a data-nav="home" href="/index.html">Home</a>
-          <a data-nav="about" href="/about.html">About</a>
-          <a data-nav="services" href="/services.html">Services</a>
-          <a data-nav="team" href="/team.html">Team</a>
-          <a data-nav="contact" href="/contact.html">Contact</a>
+          <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+          <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+          <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+          <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+          <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+          <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+          <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
         </nav>
         <div class="nav-cta">
-          <a class="btn btn-primary" href="/contact.html">Start a project</a>
-          <button type="button" class="menu-toggle" aria-label="Open menu">
+          <a class="btn btn-primary" href="/contact.html" data-i18n="nav.cta_project">Start a project</a>
+          <button type="button" class="menu-toggle" data-i18n-aria="nav.menu_aria" data-i18n-fallback="Open menu" aria-label="Open menu">
             <span></span>
           </button>
         </div>
       </div>
       <nav class="nav-mobile" aria-label="Mobile">
-        <a data-nav="home" href="/index.html">Home</a>
-        <a data-nav="about" href="/about.html">About</a>
-        <a data-nav="services" href="/services.html">Services</a>
-        <a data-nav="team" href="/team.html">Team</a>
-        <a data-nav="contact" href="/contact.html">Contact</a>
+        <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+        <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+        <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+        <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+        <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+        <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+        <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
       </nav>
     </header>
 
@@ -49,6 +55,8 @@
 
       <section class="section" id="home-services"></section>
 
+      <section class="section" id="home-projects"></section>
+
       <section class="section" id="home-about"></section>
 
       <section class="section" id="home-team"></section>
@@ -56,20 +64,20 @@
       <section class="section">
         <div class="container contact-section">
           <div>
-            <h2>Ready when you are</h2>
-            <p style="color: var(--muted); max-width: 48ch; margin: 0">
+            <h2 data-i18n="home.cta_title">Ready when you are</h2>
+            <p style="color: var(--muted); max-width: 48ch; margin: 0" data-i18n="home.cta_lead">
               Tell us about your goals—we will follow up with next steps and a clear scope proposal.
             </p>
           </div>
           <div class="contact-card">
-            <h3 style="margin-top: 0">Quick message</h3>
+            <h3 style="margin-top: 0" data-i18n="home.cta_quick_title">Quick message</h3>
             <form id="contact-form-mini">
               <div class="form-group">
-                <label for="m-name">Name</label>
+                <label for="m-name" data-i18n="form.name">Name</label>
                 <input id="m-name" name="name" required minlength="2" maxlength="120" autocomplete="name" />
               </div>
               <div class="form-group">
-                <label for="m-email">Email</label>
+                <label for="m-email" data-i18n="form.email">Email</label>
                 <input
                   id="m-email"
                   name="email"
@@ -80,15 +88,17 @@
                 />
               </div>
               <div class="form-group">
-                <label for="m-msg">Message</label>
+                <label for="m-msg" data-i18n="form.message">Message</label>
                 <textarea id="m-msg" name="message" required minlength="10" maxlength="4000"></textarea>
               </div>
-              <button type="submit" class="btn btn-primary">Send</button>
+              <button type="submit" class="btn btn-primary" data-i18n="form.send">Send</button>
               <input type="hidden" name="phone" value="" />
             </form>
             <p id="mini-status" class="form-status" role="status"></p>
             <p style="margin: 0.75rem 0 0; font-size: 0.88rem">
-              <a href="/contact.html" style="color: var(--accent); font-weight: 600">Full contact form →</a>
+              <a href="/contact.html" style="color: var(--accent); font-weight: 600" data-i18n="home.cta_full_link"
+                >Full contact form →</a
+              >
             </p>
           </div>
         </div>
@@ -103,35 +113,62 @@
               <span class="brand-mark" aria-hidden="true"></span>
               <strong data-bind="company-name">Company</strong>
             </div>
-            <p>Strategy, design, and engineering for teams that care about quality.</p>
+            <p data-i18n="footer.tagline_extra">Strategy, design, and engineering for teams that care about quality.</p>
           </div>
           <div class="footer-col">
-            <h4>Explore</h4>
+            <h4 data-i18n="footer.explore">Explore</h4>
             <ul>
-              <li><a href="/about.html">About</a></li>
-              <li><a href="/services.html">Services</a></li>
-              <li><a href="/team.html">Team</a></li>
+              <li><a href="/about.html" data-i18n="nav.about">About</a></li>
+              <li><a href="/services.html" data-i18n="nav.services">Services</a></li>
+              <li><a href="/projects.html" data-i18n="nav.work">Work</a></li>
+              <li><a href="/blog.html" data-i18n="nav.blog">Blog</a></li>
+              <li><a href="/team.html" data-i18n="nav.team">Team</a></li>
             </ul>
           </div>
           <div class="footer-col">
-            <h4>Admin</h4>
+            <h4 data-i18n="footer.admin">Admin</h4>
             <ul>
-              <li><a href="/admin/">Content admin</a></li>
-              <li><a href="/contact.html">Contact</a></li>
+              <li><a href="/admin/" data-i18n="footer.content_admin">Content admin</a></li>
+              <li><a href="/contact.html" data-i18n="nav.contact">Contact</a></li>
             </ul>
           </div>
         </div>
+        <div class="footer-newsletter" aria-labelledby="newsletter-heading">
+          <p id="newsletter-heading" class="footer-newsletter-title">Newsletter</p>
+          <p class="footer-newsletter-lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
+          <form class="footer-newsletter-form" id="newsletter-form">
+            <input
+              type="email"
+              id="newsletter-email"
+              name="email"
+              required
+              placeholder="you@example.com"
+              autocomplete="email"
+              maxlength="254"
+              aria-label="Email for newsletter"
+            />
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+          <p id="newsletter-status" class="form-status footer-newsletter-status" role="status"></p>
+        </div>
         <div class="footer-bottom">
           <span data-bind="footer-tagline">Footer</span>
-          <span>Performance-first · Secure defaults</span>
+          <span data-i18n="footer.performance">Performance-first · Secure defaults</span>
         </div>
       </div>
     </footer>
 
+    <script src="/js/i18n.js"></script>
+    <script src="/js/cookie-consent.js"></script>
     <script src="/js/shell.js"></script>
+    <script src="/js/newsletter-footer.js"></script>
+    <script src="/js/seo.js"></script>
     <script src="/js/home.js"></script>
     <script>
       (function () {
+        function msg(k, fb) {
+          return window.SiteI18n ? window.SiteI18n.t(k, fb) : fb;
+        }
         document.addEventListener("DOMContentLoaded", function () {
           var form = document.getElementById("contact-form-mini");
           var status = document.getElementById("mini-status");
@@ -154,15 +191,15 @@
               });
               var j = await r.json();
               if (!j.ok) {
-                status.textContent = j.error || "Error.";
+                status.textContent = j.error || msg("contact.error_generic", "Something went wrong.");
                 status.classList.add("err");
                 return;
               }
-              status.textContent = "Sent! We will reply soon.";
+              status.textContent = msg("contact.sent_ok_mini", "Sent! We will reply soon.");
               status.classList.add("ok");
               form.reset();
             } catch {
-              status.textContent = "Network error.";
+              status.textContent = msg("contact.error_network", "Network error.");
               status.classList.add("err");
             }
           });

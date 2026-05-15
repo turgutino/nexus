@@ -1,0 +1,55 @@
+# CI and deploy. Required repo secrets for deploy: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY.
+# Optional: SSH_PORT (defaults to 22). Server clone should live at ~/company-site (or edit script).
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Syntax check
+        run: node --check server/server.js server/db.js
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT == '' && '22' || secrets.SSH_PORT }}
+          script_stop: true
+          script: |
+            set -euo pipefail
+            cd ~/company-site
+            git pull --ff-only
+            npm ci --omit=dev
+            if pm2 describe company-site > /dev/null 2>&1; then
+              pm2 restart company-site
+            else
+              pm2 start server/server.js --name company-site
+            fi

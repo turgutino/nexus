@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <title>Blog — Company</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body data-page="blog">
+    <header class="site-header">
+      <div class="inner">
+        <a class="brand" href="/index.html">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <span data-bind="company-name">Company</span>
+        </a>
+        <nav class="nav-desktop" aria-label="Primary">
+          <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+          <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+          <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+          <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+          <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+          <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+          <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
+        </nav>
+        <div class="nav-cta">
+          <a class="btn btn-primary" href="/contact.html" data-i18n="nav.cta_project">Start a project</a>
+          <button type="button" class="menu-toggle" data-i18n-aria="nav.menu_aria" data-i18n-fallback="Open menu" aria-label="Open menu"><span></span></button>
+        </div>
+      </div>
+      <nav class="nav-mobile" aria-label="Mobile">
+        <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+        <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+        <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+        <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+        <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+        <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+        <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <header class="page-hero">
+        <h1 data-i18n="blog.page_title">Blog & news</h1>
+        <p class="lead" data-i18n="blog.page_lead">Notes on delivery, product, and studio life.</p>
+      </header>
+      <section class="section" style="padding-top: 0">
+        <form id="blog-filter-form" class="blog-filters" action="/blog.html" method="get">
+          <input
+            id="blog-search"
+            type="search"
+            name="q"
+            data-i18n-placeholder="blog.search_placeholder"
+            placeholder="Search posts…"
+            autocomplete="off"
+            maxlength="80"
+          />
+          <div id="blog-chips" style="display: flex; flex-wrap: wrap; gap: 0.5rem"></div>
+          <button type="submit" class="btn btn-primary" data-i18n="blog.search">Search</button>
+        </form>
+        <div id="blog-list-root"></div>
+        <div id="blog-pagination" class="pagination"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <div class="footer-newsletter" aria-labelledby="newsletter-heading">
+          <p id="newsletter-heading" class="footer-newsletter-title">Newsletter</p>
+          <p class="footer-newsletter-lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
+          <form class="footer-newsletter-form" id="newsletter-form">
+            <input
+              type="email"
+              id="newsletter-email"
+              name="email"
+              required
+              placeholder="you@example.com"
+              autocomplete="email"
+              maxlength="254"
+              aria-label="Email for newsletter"
+            />
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+          <p id="newsletter-status" class="form-status footer-newsletter-status" role="status"></p>
+        </div>
+        <div class="footer-bottom" style="margin-top: 0; padding-top: 0; border: 0">
+          <span data-bind="footer-tagline">Footer</span>
+          <span><a href="/projects.html" data-i18n="nav.work">Work</a></span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="/js/i18n.js"></script>
+    <script src="/js/cookie-consent.js"></script>
+    <script src="/js/shell.js"></script>
+    <script src="/js/newsletter-footer.js"></script>
+    <script src="/js/seo.js"></script>
+    <script src="/js/blog-list.js"></script>
+  </body>
+</html>

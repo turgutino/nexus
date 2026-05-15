@@ -17,12 +17,36 @@
       <div class="login-card">
         <h1>Content admin</h1>
         <p class="muted">Sign in to manage site content.</p>
-        <form id="login-form">
-          <label>Username <input name="username" autocomplete="username" required /></label>
-          <label>Password <input name="password" type="password" autocomplete="current-password" required /></label>
-          <button type="submit" class="btn primary">Sign in</button>
-        </form>
-        <p id="login-err" class="err"></p>
+        <div id="login-step-credentials">
+          <form id="login-form">
+            <label>Username <input name="username" autocomplete="username" required /></label>
+            <label>Password <input name="password" type="password" autocomplete="current-password" required /></label>
+            <button type="submit" class="btn primary">Sign in</button>
+          </form>
+          <p id="login-err" class="err"></p>
+        </div>
+        <div id="login-step-totp" class="hidden">
+          <p class="muted">Enter the 6-digit code from your authenticator app.</p>
+          <form id="login-totp-form">
+            <label
+              >Authentication code
+              <input
+                name="token"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                autocomplete="one-time-code"
+                maxlength="6"
+                placeholder="000000"
+                required
+            /></label>
+            <div class="login-totp-actions">
+              <button type="submit" class="btn primary">Verify</button>
+              <button type="button" class="btn ghost" id="login-totp-back">Back</button>
+            </div>
+          </form>
+          <p id="login-totp-err" class="err"></p>
+        </div>
         <p class="hint muted">Demo: admin / admin123 — set ADMIN_PASSWORD and SESSION_SECRET for production.</p>
         <p><a href="/index.html" class="muted">← Back to site</a></p>
       </div>
@@ -37,7 +61,15 @@
             <button type="button" data-tab="banners" class="tab">Banners</button>
             <button type="button" data-tab="services" class="tab">Services</button>
             <button type="button" data-tab="team" class="tab">Team</button>
-            <button type="button" data-tab="messages" class="tab">Messages</button>
+            <button type="button" data-tab="projects" class="tab">Projects</button>
+            <button type="button" data-tab="blog" class="tab">Blog</button>
+            <button type="button" data-tab="seo" class="tab">SEO</button>
+            <button type="button" data-tab="translations" class="tab">Translations</button>
+            <button type="button" data-tab="media" class="tab">Media</button>
+            <button type="button" data-tab="newsletter" class="tab">Newsletter</button>
+            <button type="button" data-tab="security" class="tab">Security</button>
+            <button type="button" data-tab="activity" class="tab">Activity</button>
+            <button type="button" data-tab="analytics" class="tab">Analytics</button>
           </nav>
           <div class="top-actions">
             <a href="/index.html" class="btn ghost sm">View site</a>
@@ -74,6 +106,18 @@
             <label>About page body <textarea name="about_page_body" rows="8"></textarea></label>
             <label>Mission <textarea name="about_mission" rows="3"></textarea></label>
             <label>Values <textarea name="about_values" rows="3"></textarea></label>
+            <hr />
+            <h3 style="margin: 0 0 0.5rem">Contact & map</h3>
+            <label>Google Maps embed URL (iframe src) <input name="contact_map_embed_url" placeholder="https://www.google.com/maps/embed?..." /></label>
+            <label>Default locale <input name="default_locale" placeholder="en" maxlength="8" /></label>
+            <hr />
+            <h3 style="margin: 0 0 0.5rem">Projects section (home)</h3>
+            <label>Section title <input name="home_projects_title" /></label>
+            <label>Section intro <textarea name="home_projects_intro" rows="2"></textarea></label>
+            <hr />
+            <h3 style="margin: 0 0 0.5rem">Feature flags & analytics (JSON)</h3>
+            <label>feature_flags_json <textarea name="feature_flags_json" rows="3" placeholder='{"showProjects":true,"showBlog":true}'></textarea></label>
+            <label>analytics_mock_json <textarea name="analytics_mock_json" rows="4"></textarea></label>
             <button type="submit" class="btn primary">Save homepage</button>
           </form>
         </section>
@@ -100,11 +144,197 @@
 
         <section id="tab-messages" class="tab-panel hidden">
           <h2>Contact messages</h2>
+          <p><button type="button" class="btn ghost sm" id="btn-export-csv">Export CSV</button></p>
           <div id="messages-list" class="stack"></div>
+        </section>
+
+        <section id="tab-projects" class="tab-panel hidden">
+          <h2>Projects & micro-SaaS</h2>
+          <p class="muted">Featured items surface on the homepage (when enabled in feature flags).</p>
+          <div id="projects-list-admin" class="stack"></div>
+          <button type="button" id="project-new" class="btn primary">New project</button>
+        </section>
+
+        <section id="tab-blog" class="tab-panel hidden">
+          <h2>Blog categories</h2>
+          <div id="blog-cats-admin" class="stack"></div>
+          <button type="button" id="blog-cat-new" class="btn ghost">New category</button>
+          <h2 style="margin-top: 2rem">Blog posts</h2>
+          <div id="blog-posts-admin" class="stack"></div>
+          <button type="button" id="blog-post-new" class="btn primary">New post</button>
+        </section>
+
+        <section id="tab-seo" class="tab-panel hidden">
+          <h2>Page SEO</h2>
+          <div class="card" style="margin-bottom: 1rem">
+            <h3 style="margin-top: 0">Add / update path</h3>
+            <div class="mini-form" id="seo-new-form">
+              <label>Path <input name="path" placeholder="/projects.html" /></label>
+              <label>Title <input name="meta_title" /></label>
+              <label>Description <textarea name="meta_description" rows="2"></textarea></label>
+              <label>Keywords <input name="meta_keywords" /></label>
+              <button type="button" class="btn primary" id="seo-add-btn">Save path</button>
+            </div>
+          </div>
+          <div id="seo-list-admin" class="stack"></div>
+        </section>
+
+        <section id="tab-translations" class="tab-panel hidden">
+          <h2>Translations</h2>
+          <p class="muted">All UI keys per language. Use “Save row” to persist. Public site picks up changes on reload or language switch.</p>
+          <div id="translation-matrix-wrap" class="stack"></div>
+        </section>
+
+        <section id="tab-media" class="tab-panel hidden">
+          <h2>Media library</h2>
+          <p class="muted">Files in <code>public/uploads/</code>. Copy URL for use in content fields; deleting removes the file from disk.</p>
+          <div class="media-toolbar">
+            <label class="media-search-label">
+              <span class="muted">Search by file name</span>
+              <input type="search" id="media-filter" placeholder="Filter…" autocomplete="off" />
+            </label>
+          </div>
+          <div id="media-grid" class="media-grid"></div>
+        </section>
+
+        <section id="tab-newsletter" class="tab-panel hidden">
+          <h2>Newsletter subscribers</h2>
+          <p class="muted">
+            Public sign-ups from the site footer. Active (not unsubscribed):
+            <strong id="newsletter-active-count">—</strong>
+          </p>
+          <div class="card newsletter-send-card">
+            <h3 style="margin-top: 0">Send newsletter</h3>
+            <p class="muted">
+              Sends via Resend to every <strong>active</strong> subscriber. Each email includes a unique unsubscribe link
+              (<code>SITE_URL</code>/unsubscribe.html?token=…).
+            </p>
+            <div class="grid-form newsletter-send-form">
+              <label
+                >Subject
+                <input type="text" id="newsletter-send-subject" maxlength="998" placeholder="Your subject line" autocomplete="off"
+              /></label>
+              <label
+                >HTML body
+                <textarea id="newsletter-send-html" rows="12" placeholder="&lt;p&gt;Hello…&lt;/p&gt;"></textarea>
+              </label>
+            </div>
+            <div class="newsletter-send-actions">
+              <button type="button" class="btn ghost" id="newsletter-send-preview">Preview</button>
+              <button type="button" class="btn primary" id="newsletter-send-btn">Send to active subscribers</button>
+            </div>
+            <p id="newsletter-send-status" class="status" role="status"></p>
+          </div>
+          <div class="activity-toolbar newsletter-toolbar">
+            <label class="activity-filter-label">
+              <span class="muted">Status</span>
+              <select id="newsletter-filter">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="unsubscribed">Unsubscribed</option>
+              </select>
+            </label>
+            <div class="activity-pager">
+              <button type="button" class="btn ghost sm" id="newsletter-prev" disabled>Previous</button>
+              <button type="button" class="btn ghost sm" id="newsletter-next" disabled>Next</button>
+              <button type="button" class="btn primary sm" id="newsletter-export">Export CSV (active)</button>
+            </div>
+          </div>
+          <p id="newsletter-meta" class="muted" style="margin: 0.5rem 0"></p>
+          <div class="activity-table-wrap">
+            <table class="admin-table activity-table">
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Subscribed</th>
+                  <th>Unsubscribed</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="newsletter-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="tab-security" class="tab-panel hidden">
+          <h2>Security</h2>
+          <p class="muted">Google Authenticator–compatible TOTP. Scan the QR code once, then confirm with a 6-digit code.</p>
+          <div class="card twofa-card">
+            <div class="twofa-row">
+              <span>Two-factor authentication</span>
+              <span id="twofa-switch-visual" class="twofa-switch" role="presentation"></span>
+            </div>
+            <p id="twofa-status-line" class="muted" style="margin: 0.75rem 0 0"></p>
+            <div id="twofa-off-wrap" class="twofa-off-wrap">
+              <p class="muted" style="margin-top: 1rem">Set up a new authenticator key (generates a fresh QR code each time).</p>
+              <button type="button" class="btn ghost" id="btn-twofa-setup">Show QR code</button>
+              <div id="twofa-setup-hint" class="hidden" style="margin-top: 1rem">
+                <p class="muted">Scan with your app, then enter the current code to enable.</p>
+                <img id="twofa-qr" alt="Authenticator QR code" class="twofa-qr hidden" width="220" height="220" />
+                <label class="twofa-code-label"
+                  >Verification code
+                  <input type="text" id="twofa-enable-code" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="000000"
+                /></label>
+                <button type="button" class="btn primary" id="btn-twofa-enable">Enable 2FA</button>
+              </div>
+              <p id="twofa-setup-err" class="err"></p>
+            </div>
+            <div id="twofa-on-wrap" class="hidden">
+              <p class="muted" style="margin-top: 1rem">To turn off two-factor authentication, confirm your account password.</p>
+              <label
+                >Password
+                <input type="password" id="twofa-disable-password" autocomplete="current-password"
+              /></label>
+              <button type="button" class="btn ghost" id="btn-twofa-disable">Disable 2FA</button>
+              <p id="twofa-disable-err" class="err"></p>
+            </div>
+          </div>
+        </section>
+
+        <section id="tab-activity" class="tab-panel hidden">
+          <h2>Activity log</h2>
+          <p class="muted">Write actions only (no reads). Refreshes every 30s while this tab is open.</p>
+          <div class="activity-toolbar">
+            <label class="activity-filter-label">
+              <span class="muted">Action</span>
+              <select id="activity-action-filter">
+                <option value="">All actions</option>
+              </select>
+            </label>
+            <div class="activity-pager">
+              <button type="button" class="btn ghost sm" id="activity-log-prev" disabled>Previous</button>
+              <button type="button" class="btn ghost sm" id="activity-log-next" disabled>Next</button>
+            </div>
+          </div>
+          <p id="activity-log-meta" class="muted" style="margin: 0.5rem 0"></p>
+          <div class="activity-table-wrap">
+            <table class="admin-table activity-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>User</th>
+                  <th>Action</th>
+                  <th>Entity</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="activity-log-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="tab-analytics" class="tab-panel hidden">
+          <h2>Analytics dashboard</h2>
+          <p class="muted">
+            Page traffic from the public site (analytics cookies + consent only). Visitor, project, and blog counters are also shown for comparison.
+          </p>
+          <div id="analytics-dashboard" class="stack"></div>
         </section>
       </main>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" crossorigin="anonymous"></script>
     <script src="/admin/admin.js"></script>
   </body>
 </html>

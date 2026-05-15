@@ -1,9 +1,41 @@
 (function () {
+  function msg(k, fb) {
+    return window.SiteI18n ? window.SiteI18n.t(k, fb) : fb;
+  }
+
+  async function loadMap() {
+    try {
+      const r = await fetch("/api/public/contact-page");
+      const j = await r.json();
+      if (!j.ok) return;
+      const box = document.getElementById("contact-map");
+      if (!box || !j.mapEmbedUrl) return;
+      box.innerHTML =
+        `<iframe title="${escapeAttr(msg("contact.map", "Map"))}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="${escapeAttr(
+          j.mapEmbedUrl
+        )}"></iframe>`;
+    } catch {
+      /* ignore */
+    }
+  }
+
+  function escapeAttr(s) {
+    return String(s ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/"/g, "&quot;")
+      .replace(/</g, "&lt;");
+  }
+
+  let formBound = false;
+
   async function load() {
     await SiteShell.initShell();
+    await loadMap();
+    if (window.SiteI18n) window.SiteI18n.applyDom(document);
     const form = document.getElementById("contact-form");
     const status = document.getElementById("contact-status");
-    if (!form) return;
+    if (!form || formBound) return;
+    formBound = true;
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -11,32 +43,48 @@
       status.className = "form-status";
 
       const fd = new FormData(form);
-      const payload = {
-        name: fd.get("name"),
-        email: fd.get("email"),
-        phone: fd.get("phone"),
-        message: fd.get("message"),
-      };
+      const fileInput = document.getElementById("attachment");
+      const hasFile = fileInput && fileInput.files && fileInput.files[0];
 
       try {
-        const r = await fetch("/api/public/contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        });
+        let r;
+        if (hasFile) {
+          r = await fetch("/api/public/contact", {
+            method: "POST",
+            body: fd,
+          });
+        } else {
+          r = await fetch("/api/public/contact", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name: fd.get("name"),
+              email: fd.get("email"),
+              phone: fd.get("phone"),
+              message: fd.get("message"),
+            }),
+          });
+        }
         const j = await r.json();
         if (!j.ok) {
-          status.textContent = j.error || "Something went wrong.";
+          status.textContent = j.error || msg("contact.error_generic", "Something went wrong.");
           status.classList.add("err");
           return;
         }
-        status.textContent = "Thank you — we will get back to you shortly.";
+        status.textContent = msg("contact.sent_ok", "Thank you — we will get back to you shortly.");
         status.classList.add("ok");
         form.reset();
       } catch {
-        status.textContent = "Network error. Please try again.";
+        status.textContent = msg("contact.error_network", "Network error. Please try again.");
         status.classList.add("err");
       }
+    });
+  }
+
+  if (window.SiteI18n) {
+    window.addEventListener(window.SiteI18n.LOCALE_EVENT, () => {
+      loadMap();
+      if (window.SiteI18n) window.SiteI18n.applyDom(document);
     });
   }
 

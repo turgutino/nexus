@@ -1,10 +1,27 @@
 # Company Site (`company-site`)
 
+<!-- Replace OWNER/REPO with your GitHub owner and repository (same as the clone URL). -->
+[![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/OWNER/REPO/actions/workflows/ci.yml)
+
 A **company marketing site** plus a **browser-based content admin**: homepage copy, banners, services, team, projects, blog, SEO metadata, contact messages, analytics snapshot, image uploads, and **multi-language UI strings** stored in PostgreSQL.
 
 It fits **teams that want a single Node app** serving static HTML/CSS/vanilla JS pages while keeping structured content and translations in a database.
 
+## CI/CD
+
+Workflows live under [`.github/workflows/`](.github/workflows/):
+
+| Workflow | When | What it does |
+|----------|------|----------------|
+| **CI** | Push & PR to `main` | `npm ci`, `node --check server/server.js server/db.js`. On **push** to `main` only (after tests): SSH deploy (`git pull`, `npm ci --omit=dev`, `pm2 restart` or start `company-site`). |
+| **Dependency review** | PR to `main` | Flags known-vulnerable dependency changes. |
+
+**Deploy secrets** (repository → Settings → Secrets and variables → Actions): `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`, optional `SSH_PORT` (default 22). The deploy script expects the repo at **`~/company-site`** on the server; change [`ci.yml`](.github/workflows/ci.yml) if your path differs.
+
+Update the **CI badge** at the top of this readme: replace `OWNER/REPO` with your GitHub namespace and repository name.
+
 ---
+
 
 ## Tech stack
 

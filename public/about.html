@@ -3,6 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
     <title>About — Company</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -20,30 +22,34 @@
           <span data-bind="company-name">Company</span>
         </a>
         <nav class="nav-desktop" aria-label="Primary">
-          <a data-nav="home" href="/index.html">Home</a>
-          <a data-nav="about" href="/about.html">About</a>
-          <a data-nav="services" href="/services.html">Services</a>
-          <a data-nav="team" href="/team.html">Team</a>
-          <a data-nav="contact" href="/contact.html">Contact</a>
+          <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+          <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+          <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+          <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+          <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+          <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+          <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
         </nav>
         <div class="nav-cta">
-          <a class="btn btn-primary" href="/contact.html">Start a project</a>
-          <button type="button" class="menu-toggle" aria-label="Open menu"><span></span></button>
+          <a class="btn btn-primary" href="/contact.html" data-i18n="nav.cta_project">Start a project</a>
+          <button type="button" class="menu-toggle" data-i18n-aria="nav.menu_aria" data-i18n-fallback="Open menu" aria-label="Open menu"><span></span></button>
         </div>
       </div>
       <nav class="nav-mobile" aria-label="Mobile">
-        <a data-nav="home" href="/index.html">Home</a>
-        <a data-nav="about" href="/about.html">About</a>
-        <a data-nav="services" href="/services.html">Services</a>
-        <a data-nav="team" href="/team.html">Team</a>
-        <a data-nav="contact" href="/contact.html">Contact</a>
+        <a data-nav="home" href="/index.html" data-i18n="nav.home">Home</a>
+        <a data-nav="about" href="/about.html" data-i18n="nav.about">About</a>
+        <a data-nav="services" href="/services.html" data-i18n="nav.services">Services</a>
+        <a data-nav="projects" href="/projects.html" data-i18n="nav.work">Work</a>
+        <a data-nav="blog" href="/blog.html" data-i18n="nav.blog">Blog</a>
+        <a data-nav="team" href="/team.html" data-i18n="nav.team">Team</a>
+        <a data-nav="contact" href="/contact.html" data-i18n="nav.contact">Contact</a>
       </nav>
     </header>
 
     <main class="container">
       <header class="page-hero">
-        <h1>About us</h1>
-        <p class="lead">How we work, what we optimize for, and why teams partner with us.</p>
+        <h1 data-i18n="about.page_title">About us</h1>
+        <p class="lead" data-i18n="about.page_lead">How we work, what we optimize for, and why teams partner with us.</p>
       </header>
       <div id="about-dynamic" class="section" style="padding-top: 0"></div>
     </main>
@@ -56,31 +62,53 @@
               <span class="brand-mark" aria-hidden="true"></span>
               <strong data-bind="company-name">Company</strong>
             </div>
-            <p>Strategy, design, and engineering for teams that care about quality.</p>
+            <p data-i18n="footer.tagline_extra">Strategy, design, and engineering for teams that care about quality.</p>
           </div>
           <div class="footer-col">
-            <h4>Explore</h4>
+            <h4 data-i18n="footer.explore">Explore</h4>
             <ul>
-              <li><a href="/services.html">Services</a></li>
-              <li><a href="/team.html">Team</a></li>
-              <li><a href="/contact.html">Contact</a></li>
+              <li><a href="/services.html" data-i18n="nav.services">Services</a></li>
+              <li><a href="/team.html" data-i18n="nav.team">Team</a></li>
+              <li><a href="/contact.html" data-i18n="nav.contact">Contact</a></li>
             </ul>
           </div>
           <div class="footer-col">
-            <h4>Admin</h4>
+            <h4 data-i18n="footer.admin">Admin</h4>
             <ul>
-              <li><a href="/admin/">Content admin</a></li>
+              <li><a href="/admin/" data-i18n="footer.content_admin">Content admin</a></li>
             </ul>
           </div>
         </div>
+        <div class="footer-newsletter" aria-labelledby="newsletter-heading">
+          <p id="newsletter-heading" class="footer-newsletter-title">Newsletter</p>
+          <p class="footer-newsletter-lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
+          <form class="footer-newsletter-form" id="newsletter-form">
+            <input
+              type="email"
+              id="newsletter-email"
+              name="email"
+              required
+              placeholder="you@example.com"
+              autocomplete="email"
+              maxlength="254"
+              aria-label="Email for newsletter"
+            />
+            <button type="submit" class="btn btn-primary">Subscribe</button>
+          </form>
+          <p id="newsletter-status" class="form-status footer-newsletter-status" role="status"></p>
+        </div>
         <div class="footer-bottom">
           <span data-bind="footer-tagline">Footer</span>
-          <span>Performance-first · Secure defaults</span>
+          <span data-i18n="footer.performance">Performance-first · Secure defaults</span>
         </div>
       </div>
     </footer>
 
+    <script src="/js/i18n.js"></script>
+    <script src="/js/cookie-consent.js"></script>
     <script src="/js/shell.js"></script>
+    <script src="/js/newsletter-footer.js"></script>
+    <script src="/js/seo.js"></script>
     <script src="/js/about.js"></script>
   </body>
 </html>
