@@ -5,14 +5,26 @@ node_modules/
 .env
 .env.local
 .env.*.local
+.env.docker
 *.pem
 *.p12
+*.key
+*.crt
+*.cer
 
 # Runtime data (legacy SQLite path used by import script)
 data/
 *.db
+*.db-shm
+*.db-wal
 *.sqlite
 *.sqlite3
+
+# Redis dumps / persistence artifacts (common local filenames)
+dump.rdb
+*.rdb
+appendonly.aof
+appendonlydir/
 
 # Uploaded user content (keep directory with .gitkeep)
 public/uploads/*
@@ -33,6 +45,7 @@ lerna-debug.log*
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+$RECYCLE.BIN/
 
 # Editor and IDE
 .idea/
@@ -40,6 +53,7 @@ Desktop.ini
 *.swp
 *.swo
 *~
+*.iml
 
 # Test / coverage (if added later)
 coverage/
@@ -51,12 +65,21 @@ dist/
 build/
 out/
 .cache/
+.turbo/
+.parcel-cache/
 
 # Temp files
 tmp/
 temp/
 *.tmp
 *.temp
+
+# Process / PM2 (local)
+.pm2/
+*.pid
+
+# Docker Compose overrides (often contain machine-specific or secret values)
+docker-compose.override.yml
 
 # Misc
 .eslintcache
