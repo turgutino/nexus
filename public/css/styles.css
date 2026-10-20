@@ -97,7 +97,7 @@ select {
   width: 36px;
   height: 36px;
   border-radius: 11px;
-  background: var(--gradient);
+  background: url(/img/logo.svg) center / cover no-repeat;
   box-shadow: 0 8px 24px rgba(56, 189, 248, 0.35);
 }
 
