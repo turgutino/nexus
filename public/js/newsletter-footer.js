@@ -1,4 +1,8 @@
 (function () {
+  function T(key, fallback) {
+    return window.SiteI18n ? window.SiteI18n.t(key, fallback) : fallback;
+  }
+
   function init() {
     var form = document.getElementById("newsletter-form");
     var status = document.getElementById("newsletter-status");
@@ -24,16 +28,16 @@
           var ok = _ref.ok;
           var j = _ref.j;
           if (!ok) {
-            status.textContent = (j && j.error) || "Something went wrong.";
+            status.textContent = T("contact.error_generic", "Something went wrong.");
             status.className = "form-status footer-newsletter-status err";
             return;
           }
-          status.textContent = "Almost done — check your inbox and click the confirmation link.";
+          status.textContent = T("newsletter.pending", "Almost done — check your inbox and click the confirmation link.");
           status.className = "form-status footer-newsletter-status ok";
           form.reset();
         })
         .catch(function () {
-          status.textContent = "Network error. Try again later.";
+          status.textContent = T("contact.error_network", "Network error. Please try again.");
           status.className = "form-status footer-newsletter-status err";
         });
     });

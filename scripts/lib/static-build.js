@@ -21,8 +21,12 @@ function normalizeBase(raw) {
  */
 function rewriteAssetPaths(text, base) {
   if (!base) return text;
-  const re = new RegExp('(["\'`(])/(?=(?:css|js|img|data|uploads)/|(?:' + PAGES.join('|') + ')\.html)', 'g');
-  return text.replace(re, `$1${base}/`);
+  const re = new RegExp('(["\'`(])/(?=(?:css|js|img|data|uploads)/|(?:' + PAGES.join('|') + ')\\.html)', 'g');
+  // Lines tagged "static:keep" hold path literals that are compared (not navigated to) and must stay untouched.
+  return text
+    .split('\n')
+    .map((line) => (line.includes('static:keep') ? line : line.replace(re, `$1${base}/`)))
+    .join('\n');
 }
 
 /** Pages read location.pathname; with a base path they must see the path relative to the base. */
@@ -65,6 +69,9 @@ function transformHtml(html, base, config) {
     '<style>/* static build: features that need a server are hidden */' +
     '.footer-newsletter,#cookie-consent-banner,label[for="attachment"],#attachment{display:none!important}</style>';
   out = out.replace('</head>', `    ${css}\n  </head>`);
+  // The static site has no admin panel: drop the footer link and give that column a translated "Contact" heading.
+  out = out.replace(/\s*<li><a href="\/admin\/"[^>]*>[^<]*<\/a><\/li>/g, '');
+  out = out.replace('<h4 data-i18n="footer.admin">Admin</h4>', '<h4 data-i18n="nav.contact">Contact</h4>');
   return rewriteAssetPaths(out, base);
 }
 

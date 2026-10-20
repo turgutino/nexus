@@ -2,6 +2,18 @@
   function msg(k, fb) {
     return window.SiteI18n ? window.SiteI18n.t(k, fb) : fb;
   }
+  function contactError(r, j) {
+    if (r && r.status === 429) return msg("contact.err_limit", "Too many requests. Try again later.");
+    if (j && j.code) {
+      var base = msg("contact.err_" + j.code, "");
+      if (base) {
+        return j.code === "unavailable" && j.email
+          ? base + " " + msg("contact.err_email_us", "Please email us at") + " " + j.email + "."
+          : base;
+      }
+    }
+    return (j && j.error) || msg("contact.error_generic", "Something went wrong.");
+  }
   document.addEventListener("DOMContentLoaded", function () {
     var form = document.getElementById("contact-form-mini");
     var status = document.getElementById("mini-status");
@@ -24,7 +36,7 @@
         });
         var j = await r.json();
         if (!j.ok) {
-          status.textContent = j.error || msg("contact.error_generic", "Something went wrong.");
+          status.textContent = contactError(r, j);
           status.classList.add("err");
           return;
         }

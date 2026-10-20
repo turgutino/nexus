@@ -48,23 +48,23 @@
     </header>
 
     <main class="container section" style="padding-top: 2.5rem; padding-bottom: 3rem; max-width: 44rem">
-      <h1 style="margin-top: 0">Confirm your subscription</h1>
-      <p id="token-status" class="form-status" role="status">Checking link…</p>
-      <p><button type="button" class="btn btn-primary" id="token-confirm-btn" hidden>Confirm subscription</button></p>
-      <p class="muted" style="margin-top: 1.5rem; max-width: 52ch">
+      <h1 style="margin-top: 0" data-i18n="confirm.title">Confirm your subscription</h1>
+      <p id="token-status" class="form-status" role="status"></p>
+      <p><button type="button" class="btn btn-primary" id="token-confirm-btn" data-i18n="confirm.button" hidden>Confirm subscription</button></p>
+      <p class="muted" style="margin-top: 1.5rem; max-width: 52ch" data-i18n="confirm.note">
         Confirmation links are unique to your request and expire after 3 days. If this page shows an error, subscribe again
         from the form in the footer.
       </p>
       <p style="margin-top: 1.25rem">
-        <a href="/index.html" style="color: var(--accent); font-weight: 600">← Home</a>
+        <a href="/index.html" style="color: var(--accent); font-weight: 600">← <span data-i18n="nav.home">Home</span></a>
       </p>
     </main>
 
     <footer class="site-footer">
       <div class="container">
         <div class="footer-newsletter" aria-labelledby="newsletter-heading">
-          <p id="newsletter-heading" class="footer-newsletter-title">Newsletter</p>
-          <p class="footer-newsletter-lead">Need a new confirmation link? Enter your email below.</p>
+          <p id="newsletter-heading" class="footer-newsletter-title" data-i18n="newsletter.title">Newsletter</p>
+          <p class="footer-newsletter-lead" data-i18n="newsletter.lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
           <form class="footer-newsletter-form" id="newsletter-form">
             <input
               type="email"
@@ -75,8 +75,10 @@
               autocomplete="email"
               maxlength="254"
               aria-label="Email for newsletter"
+              data-i18n-aria="newsletter.email_aria"
+              data-i18n-fallback="Email for newsletter"
             />
-            <button type="submit" class="btn btn-primary">Subscribe</button>
+            <button type="submit" class="btn btn-primary" data-i18n="newsletter.subscribe">Subscribe</button>
           </form>
           <p id="newsletter-status" class="form-status footer-newsletter-status" role="status"></p>
         </div>

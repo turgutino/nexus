@@ -159,9 +159,12 @@
 
   async function submitContact(init) {
     var fields = readFields(init && init.body);
+    // "code" lets the page show the message in the visitor's language.
     if (!CONFIG.contactEndpoint) {
-      var hint = CONFIG.contactEmail ? " Please email us at " + CONFIG.contactEmail + "." : "";
-      return json({ ok: false, error: "The contact form is not available right now." + hint }, 503);
+      return json(
+        { ok: false, code: "unavailable", email: CONFIG.contactEmail || "", error: "The contact form is not available right now." },
+        503
+      );
     }
     var payload = Object.assign({}, CONFIG.contactExtraFields || {}, {
       name: fields.name,
@@ -176,9 +179,9 @@
         body: JSON.stringify(payload),
       });
       if (r.ok) return json({ ok: true });
-      return json({ ok: false, error: "Could not send your message. Please try again later." }, 502);
+      return json({ ok: false, code: "send", error: "Could not send your message. Please try again later." }, 502);
     } catch (e) {
-      return json({ ok: false, error: "Network error. Please try again later." }, 502);
+      return json({ ok: false, code: "send", error: "Could not send your message. Please try again later." }, 502);
     }
   }
 

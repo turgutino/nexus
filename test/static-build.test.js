@@ -58,3 +58,23 @@ test('sitemap escapes and uses the site url', () => {
   assert.ok(xml.includes('<loc>https://x.example/app/</loc>'));
   assert.ok(xml.includes('post.html?slug=a%26b'));
 });
+
+test('static build removes the admin footer link and renames the heading', () => {
+  const html =
+    '<head></head><div class="footer-col"><h4 data-i18n="footer.admin">Admin</h4><ul>' +
+    '<li><a href="/admin/" data-i18n="footer.content_admin">Content admin</a></li>' +
+    '<li><a href="/contact.html" data-i18n="nav.contact">Contact</a></li></ul></div><script></script>';
+  const out = lib.transformHtml(html, '', {});
+  assert.ok(!out.includes('/admin/'));
+  assert.ok(!out.includes('footer.admin'));
+  assert.ok(out.includes('<h4 data-i18n="nav.contact">Contact</h4>'));
+  assert.ok(out.includes('href="/contact.html"'));
+});
+
+test('lines tagged static:keep are not rewritten', () => {
+  const kept = 'a = "/about.html"; // static:keep';
+  const moved = 'b = "/about.html";';
+  const out = lib.rewriteAssetPaths([kept, moved].join(String.fromCharCode(10)), '/nexus').split(String.fromCharCode(10));
+  assert.equal(out[0], kept);
+  assert.equal(out[1], 'b = "/nexus/about.html";');
+});

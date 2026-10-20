@@ -70,7 +70,7 @@
           <div class="hero-glow" aria-hidden="true"></div>
           <div class="hero-card">
             <div class="media">
-              ${mediaOrPlaceholder(site.hero.image, T("home.hero_placeholder", "Hero image — set in admin"))}
+              ${mediaOrPlaceholder(site.hero.image, "")}
             </div>
           </div>
         </div>
@@ -176,7 +176,7 @@
       rootAbout.innerHTML = `
         <div class="container split-about">
           <div class="visual">
-            ${mediaOrPlaceholder(site.homeAbout.image, T("home.about_image_placeholder", "About image — optional"))}
+            ${mediaOrPlaceholder(site.homeAbout.image, "")}
           </div>
           <div>
             <h2>${escapeHtml(site.homeAbout.title)}</h2>

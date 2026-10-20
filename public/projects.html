@@ -62,8 +62,8 @@
     <footer class="site-footer">
       <div class="container">
         <div class="footer-newsletter" aria-labelledby="newsletter-heading">
-          <p id="newsletter-heading" class="footer-newsletter-title">Newsletter</p>
-          <p class="footer-newsletter-lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
+          <p id="newsletter-heading" class="footer-newsletter-title" data-i18n="newsletter.title">Newsletter</p>
+          <p class="footer-newsletter-lead" data-i18n="newsletter.lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
           <form class="footer-newsletter-form" id="newsletter-form">
             <input
               type="email"
@@ -74,8 +74,10 @@
               autocomplete="email"
               maxlength="254"
               aria-label="Email for newsletter"
+              data-i18n-aria="newsletter.email_aria"
+              data-i18n-fallback="Email for newsletter"
             />
-            <button type="submit" class="btn btn-primary">Subscribe</button>
+            <button type="submit" class="btn btn-primary" data-i18n="newsletter.subscribe">Subscribe</button>
           </form>
           <p id="newsletter-status" class="form-status footer-newsletter-status" role="status"></p>
         </div>

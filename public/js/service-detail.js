@@ -35,7 +35,7 @@
       return;
     }
     const s = j.service;
-    document.title = s.title + " — Services";
+    document.title = s.title + " — " + (window.SiteI18n ? window.SiteI18n.t("services.page_title", "Services") : "Services");
     const heroH1 = document.querySelector("main .page-hero h1");
     if (heroH1) heroH1.textContent = s.title;
     root.innerHTML = `

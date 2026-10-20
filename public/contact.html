@@ -60,9 +60,6 @@
           <div class="contact-card">
             <h3 style="margin-top: 0" data-i18n="contact.map">Map</h3>
             <div id="contact-map" class="map-embed-wrap" aria-hidden="true"></div>
-            <p class="muted" style="font-size: 0.88rem; margin-top: 0.75rem" data-i18n="contact.map_note">
-              Embed URL is configurable in the admin panel.
-            </p>
           </div>
           <div class="contact-card" style="margin-top: 1rem">
             <h3 style="margin-top: 0" data-i18n="contact.hours">Office hours</h3>
@@ -106,8 +103,8 @@
     <footer class="site-footer">
       <div class="container">
         <div class="footer-newsletter" aria-labelledby="newsletter-heading">
-          <p id="newsletter-heading" class="footer-newsletter-title">Newsletter</p>
-          <p class="footer-newsletter-lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
+          <p id="newsletter-heading" class="footer-newsletter-title" data-i18n="newsletter.title">Newsletter</p>
+          <p class="footer-newsletter-lead" data-i18n="newsletter.lead">Occasional updates. Unsubscribe anytime using the link in your emails.</p>
           <form class="footer-newsletter-form" id="newsletter-form">
             <input
               type="email"
@@ -118,8 +115,10 @@
               autocomplete="email"
               maxlength="254"
               aria-label="Email for newsletter"
+              data-i18n-aria="newsletter.email_aria"
+              data-i18n-fallback="Email for newsletter"
             />
-            <button type="submit" class="btn btn-primary">Subscribe</button>
+            <button type="submit" class="btn btn-primary" data-i18n="newsletter.subscribe">Subscribe</button>
           </form>
           <p id="newsletter-status" class="form-status footer-newsletter-status" role="status"></p>
         </div>

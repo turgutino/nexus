@@ -1,4 +1,19 @@
 (function () {
+  function formatDate(value) {
+    var d = new Date(value);
+    if (isNaN(d.getTime())) return String(value || "");
+    var loc = window.SiteI18n ? window.SiteI18n.getLocale() : "en";
+    var AZ_MONTHS = ["yanvar", "fevral", "mart", "aprel", "may", "iyun", "iyul", "avqust", "sentyabr", "oktyabr", "noyabr", "dekabr"];
+    try {
+      var out = new Intl.DateTimeFormat(loc, { dateStyle: "long" }).format(d);
+      // Some browsers ship without Azerbaijani date data and print "2026 M09 28".
+      if (loc === "az" && /M\d\d/.test(out)) return d.getDate() + " " + AZ_MONTHS[d.getMonth()] + " " + d.getFullYear();
+      return out;
+    } catch (e) {
+      return d.toISOString().slice(0, 10);
+    }
+  }
+
   function esc(s) {
     return String(s ?? "")
       .replace(/&/g, "&amp;")
@@ -84,7 +99,7 @@
           .map(
             (p) => `
           <article class="service-card">
-            <p class="post-meta">${esc(p.categoryName)} · ${esc(p.publishedAt)} · ${p.viewCount} ${esc(T("blog.views", "views"))}</p>
+            <p class="post-meta">${esc(p.categoryName)} · ${esc(formatDate(p.publishedAt))} · ${p.viewCount} ${esc(T("blog.views", "views"))}</p>
             <h3 style="margin:0 0 0.5rem">${esc(p.title)}</h3>
             <p style="color:var(--muted);flex:1">${esc(p.excerpt)}</p>
             <a class="link-arrow" href="/post.html?slug=${encodeURIComponent(p.slug)}">${esc(T("common.read", "Read →"))}</a>

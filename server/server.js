@@ -864,10 +864,11 @@ app.get(
 );
 
 async function handleContactSubmission(req, res) {
-  const reject = async (status, error) => {
+  // "code" lets the browser show the message in the visitor's language; "error" stays as an English fallback.
+  const reject = async (status, error, code) => {
     // Uploaded attachment is only kept for accepted submissions.
     if (req.file) await sec.removeFileQuietly(req.file.path);
-    return res.status(status).json({ ok: false, error });
+    return res.status(status).json({ ok: false, error, code });
   };
 
   const name = stripText(req.body.name, 120);
@@ -875,9 +876,9 @@ async function handleContactSubmission(req, res) {
   const phone = stripText(req.body.phone, 40);
   const message = stripMultiline(req.body.message, 4000);
 
-  if (!name || name.length < 2) return reject(400, 'Please enter your name.');
-  if (!validator.isEmail(email)) return reject(400, 'Please enter a valid email.');
-  if (!message || message.length < 10) return reject(400, 'Please enter a longer message.');
+  if (!name || name.length < 2) return reject(400, 'Please enter your name.', 'name');
+  if (!validator.isEmail(email)) return reject(400, 'Please enter a valid email.', 'email');
+  if (!message || message.length < 10) return reject(400, 'Please enter a longer message.', 'message');
 
   let attachment_path = '';
   let attachment_name = '';

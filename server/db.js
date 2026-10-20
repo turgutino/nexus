@@ -5,6 +5,7 @@ const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const { getAllSeedRows, getSeedStringsForLocale } = require('./i18n-seeds');
 const { passwordProblem, WEAK_PASSWORDS } = require('./lib/security');
+const I18N_FIXES = require('./i18n-fixes');
 
 const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
 
@@ -306,6 +307,7 @@ async function seedIfEmpty() {
   await seedProjectsIfEmpty();
   await seedSeoIfEmpty();
   await seedTranslationsIfEmpty();
+  await applyI18nFixes();
 }
 
 async function seedBlogIfEmpty() {
@@ -485,6 +487,23 @@ async function seedI18nFromMatrix() {
       [locale, key, value]
     );
   }
+}
+
+/**
+ * One-time corrections to translations shipped earlier. Only rows that still hold the old default
+ * are updated, so anything edited in the admin panel is preserved.
+ */
+async function applyI18nFixes() {
+  const version = 'i18n-fixes-1';
+  const done = await q1('SELECT 1 AS x FROM schema_migrations WHERE version = ?', [version]);
+  if (done) return;
+  for (const f of I18N_FIXES) {
+    await query(
+      `UPDATE translations SET value = ? WHERE locale = ? AND translation_key = ? AND value = ?`,
+      [f.to, f.locale, f.key, f.from]
+    );
+  }
+  await query('INSERT INTO schema_migrations (version) VALUES (?)', [version]);
 }
 
 async function seedTranslationsIfEmpty() {
