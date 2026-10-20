@@ -1,7 +1,11 @@
 node_modules
 data
 .git
+.github
 .env
 .env.*
 *.md
 .cursor
+public/uploads/*
+test
+scripts

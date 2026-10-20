@@ -13,7 +13,7 @@ Professional company marketing site with a browser-based content admin, PostgreS
 - **Analytics (first-party)**: After consent, `shell.js` posts to `/api/public/track-page` (path + referrer); legacy visit counter via `POST /api/public/track-visit`. Admin dashboard reads `page_views`, `daily_stats`, and aggregates.
 - **SEO**: Per-path meta from `page_seo` via `GET /api/public/seo?path=...`; shared defaults from `site` payload when no row exists. Client helper: `/public/js/seo.js`.
 - **Sitemap**: `GET /sitemap.xml` lists static HTML routes, services, projects, and published blog posts; base URL from `SITE_URL` or `http://localhost:$PORT`.
-- **Robots**: `public/robots.txt` allows `/`, disallows `/admin/`, references sitemap.
+- **Robots**: `GET /robots.txt` is generated (allows `/`, disallows `/admin/`, `/api/`, `/uploads/`, absolute sitemap URL from `SITE_URL`).
 
 ### Admin panel (`/admin/`)
 
@@ -31,7 +31,7 @@ Professional company marketing site with a browser-based content admin, PostgreS
   - **Newsletter** — Paginated subscribers, status filter, CSV export of active emails, HTML newsletter send via Resend with per-recipient unsubscribe footer.
   - **Security** — TOTP 2FA setup (QR + enable/disable with password).
   - **Activity** — Paginated `activity_log`, action filter, auto-refresh every 30s while open.
-  - **Analytics** — Charts (Chart.js CDN) for daily views/uniques, devices, top pages and referrers; legacy visitor count and content view totals.
+  - **Analytics** — Charts (Chart.js, served from this server — no third-party script) for daily views/uniques, devices, top pages and referrers; legacy visitor count and content view totals.
 
 **Contact messages**: `public/admin/index.html` includes a **Contact messages** section (`#tab-messages`) with CSV export and list rendering driven by bootstrap data, but there is **no tab button** in the current nav to switch to that panel (APIs and export still exist).
 
@@ -77,7 +77,6 @@ company-site/
 │   ├── js/                 # i18n, shell, pages, cookie-consent, newsletter-footer, seo, …
 │   ├── uploads/.gitkeep
 │   ├── *.html              # Site pages + unsubscribe.html
-│   └── robots.txt
 └── server/
     ├── db.js               # Pool, migrations runner, seeding, helpers
     ├── i18n-seeds.js       # Default locale matrix + labels
@@ -132,8 +131,11 @@ Read from `.env` via `server/pg-config.js` (and `process.env` elsewhere). All ar
 | Variable | Role |
 |----------|------|
 | `PORT` | HTTP port (default `3000`). |
-| `NODE_ENV` | If `production`, stricter cookie `Secure`, production `SESSION_SECRET` required, and newsletter base URL logic. |
-| `SESSION_SECRET` | Express session signing secret. **Required in production** (server exits if missing). Dev fallback exists only when not production. |
+| `NODE_ENV` | If `production`: `Secure` admin cookies, strong `SESSION_SECRET` required (32+ chars, not a placeholder), the app refuses to start while the admin account uses a default/weak password, newsletter signup needs full email config. |
+| `TRUST_PROXY` | Number of reverse proxies in front of the app (`0` = exposed directly, default). Set `1` behind nginx/Caddy/a load balancer. A wrong value lets clients spoof their IP and bypass rate limits. |
+| `COOKIE_SECURE` | Defaults to `true` in production. `false` only for plain-HTTP internal testing (admin login does not work over HTTP otherwise). |
+| `BIND_ADDR` | Docker Compose only: interface the app port is published on (default `127.0.0.1`). |
+| `SESSION_SECRET` | Session signing secret. **Required in production**, 32+ random characters (`openssl rand -hex 48`); the server exits on a missing or weak value. Dev fallback exists only outside production. |
 | `REDIS_URL` | Redis connection string for session store (default `redis://localhost:6379`). Compose overrides to `redis://redis:6379` for the app container. |
 | `DATABASE_URL` | Full PostgreSQL URL; if set, used instead of discrete `DB_*` fields. |
 | `DB_HOST` | Postgres host (default `localhost`). |
@@ -152,7 +154,9 @@ Read from `.env` via `server/pg-config.js` (and `process.env` elsewhere). All ar
 ## Admin access
 
 - URL: **`/admin/`** (also disallowed in `robots.txt` for crawlers).
-- Credentials: whatever was seeded — first boot uses `ADMIN_USERNAME` / `ADMIN_PASSWORD` from `.env` if no admin row exists; the login UI hints at `admin` / `admin123` when using defaults.
+- Credentials: the first boot creates the admin from `ADMIN_USERNAME` / `ADMIN_PASSWORD` (12+ characters; production rejects weak/default values). Changing `.env` later has no effect on an existing account — use **Admin → Security → Change password**, or `npm run admin:reset-password` (Docker: `docker compose exec app node server/scripts/reset-admin.js`).
+- Lost your authenticator device? `npm run admin:disable-2fa`.
+- Changing the password signs out every other admin session.
 - With **TOTP enabled**, after password login the API returns `needTotp: true` and the UI collects a 6-digit code.
 
 ## API overview
@@ -206,13 +210,13 @@ Public pages load overlay strings from API; CMS can override via **Translations*
 1. Create a Resend account and verify sending domain / sender.
 2. Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in `.env`.
 3. Set `SITE_URL` to the deployed HTTPS origin (used in unsubscribe links in sent HTML).
-4. Use **Newsletter** tab: compose HTML, preview, send to all **active** subscribers. Each message appends an unsubscribe block linking to `{SITE_URL}/unsubscribe.html?token=…`.
+4. Use **Newsletter** tab: compose HTML, preview, send to all **active** subscribers. Sending runs in the background (batches of 100) and the tab shows the final counts. Each message appends an unsubscribe link (`{SITE_URL}/unsubscribe.html?token=…`) and `List-Unsubscribe` one-click headers.
 
-Public signup: footer forms use `/public/js/newsletter-footer.js` → `POST /api/public/newsletter/subscribe`.
+Public signup uses **double opt-in**: `POST /api/public/newsletter/subscribe` stores the address as `pending` and emails a confirmation link (`/confirm.html?token=…`, valid 3 days). Only confirmed (`active`) subscribers receive newsletters. Confirm and unsubscribe are `POST` actions triggered by a button on the page, so mail scanners that merely open the link cannot change anything. In production signup returns 503 until `RESEND_API_KEY`, `RESEND_FROM_EMAIL` and `SITE_URL` are all set; in development the confirmation link is printed to the server log.
 
 ## CI/CD (GitHub Actions)
 
-- **`ci.yml`**: On PRs and pushes to `main`, runs `npm ci` and `node --check` on `server/server.js` and `server/db.js` (Node 20). On **push to `main` only**, a **deploy** job SSHs to the server and runs `git pull`, `npm ci --omit=dev`, and `pm2 restart` or `pm2 start server/server.js --name company-site` in `~/company-site`.
+- **`ci.yml`**: On PRs and pushes to `main`, runs `npm ci`, `npm run check` (syntax of every server/browser script), `npm test` (unit tests) and `npm audit --audit-level=high` (Node 20). On **push to `main` only**, a **deploy** job SSHs to the server and runs `git pull`, `npm ci --omit=dev`, and `pm2 restart` or `pm2 start server/server.js --name company-site` in `~/company-site`.
   - **Repository secrets (deploy)** commented in the workflow: `SSH_HOST`, `SSH_USER`, `SSH_PRIVATE_KEY`; optional `SSH_PORT` (defaults to 22 in script logic).
 - **`dependency-review.yml`**: On PRs to `main`, runs GitHub’s dependency review action (requires Dependency graph / advisory data on the repo).
 
@@ -235,3 +239,34 @@ Run against a Postgres URL/config matching `.env` from project root.
 ## License
 
 This repository does **not** include a `LICENSE` file. All rights may be reserved; clarify terms with the repository owner before redistribution.
+
+## Deploying
+
+Step-by-step guide for a free VPS with automatic HTTPS: see **[DEPLOY.md](DEPLOY.md)** (`docker-compose.prod.yml`, `deploy/Caddyfile`, `deploy/backup.sh`).
+
+## Security and production checklist
+
+Before going live:
+
+1. Copy `.env.example` to `.env` and set: `SESSION_SECRET` (random, 32+ chars), `ADMIN_PASSWORD` (12+ chars), strong `DB_PASSWORD`, `SITE_URL` (your `https://` origin), and the `RESEND_*` variables.
+2. Serve the site over **HTTPS** through a reverse proxy (Caddy/nginx/load balancer) and set `TRUST_PROXY=1`. Admin cookies are `Secure` in production, so login will not work over plain HTTP.
+3. Do not publish the Postgres/Redis ports. Docker Compose publishes only the app port, on `127.0.0.1` by default.
+4. Enable 2FA in **Admin → Security** and keep `npm run admin:disable-2fa` in mind as the recovery path.
+5. Uploads live in the `uploads` Docker volume; back it up together with the database.
+
+What the app enforces: strict Content-Security-Policy (same-origin scripts only), uploads validated by MIME type **and** file signature with the extension derived from the MIME type, uploaded files served with `nosniff`, a sandboxing CSP and download disposition for non-images, per-IP rate limits, admin sessions invalidated on password change, one-time TOTP codes with a 5-attempt cap per challenge, URL scheme allow-lists for links/images/map embeds, and neutralised spreadsheet formulas in CSV exports.
+
+### Backups
+
+```bash
+docker compose exec -T postgres pg_dump -U "$DB_USER" "$DB_NAME" | gzip > backup-$(date +%F).sql.gz
+docker run --rm -v companysite_uploads:/data -v "$PWD":/backup alpine tar czf /backup/uploads-$(date +%F).tgz -C /data .
+```
+
+### Monitoring
+
+`GET /healthz` returns `200` when the app can reach the database (used by the Docker `HEALTHCHECK`); point your uptime monitor at it.
+
+### Tests
+
+`npm test` runs the unit tests in `test/` (security helpers). `npm run check` syntax-checks all scripts.

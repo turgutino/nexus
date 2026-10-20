@@ -1,5 +1,6 @@
 # CI and deploy. Required repo secrets for deploy: SSH_HOST, SSH_USER, SSH_PRIVATE_KEY.
-# Optional: SSH_PORT (defaults to 22). Server clone should live at ~/company-site (or edit script).
+# Optional: SSH_PORT (defaults to 22). Server clone should live at ~/company-site (see DEPLOY.md).
+# Deploy runs Docker Compose with the production overlay (Caddy + HTTPS) on the server.
 
 name: CI
 
@@ -27,15 +28,28 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Syntax check
-        run: node --check server/server.js server/db.js
+      - name: Syntax check (all server and browser scripts)
+        run: npm run check
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Dependency audit (fails on high/critical)
+        run: npm audit --omit=dev --audit-level=high
 
   deploy:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      HAS_SSH_SECRETS: ${{ secrets.SSH_HOST != '' && secrets.SSH_PRIVATE_KEY != '' }}
     steps:
+      - name: Skip deploy (SSH secrets not configured)
+        if: env.HAS_SSH_SECRETS != 'true'
+        run: echo "Deploy skipped - add SSH_HOST, SSH_USER and SSH_PRIVATE_KEY repository secrets to enable it."
+
       - name: Deploy over SSH
+        if: env.HAS_SSH_SECRETS == 'true'
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -47,9 +61,5 @@ jobs:
             set -euo pipefail
             cd ~/company-site
             git pull --ff-only
-            npm ci --omit=dev
-            if pm2 describe company-site > /dev/null 2>&1; then
-              pm2 restart company-site
-            else
-              pm2 start server/server.js --name company-site
-            fi
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+            docker image prune -f

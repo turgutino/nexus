@@ -18,6 +18,7 @@ const {
   uploadsDir,
   getKvMap,
   setKv,
+  incrementKv,
   slugify,
   qr,
   q1,
@@ -29,6 +30,8 @@ const {
   logActivity,
 } = require('./db');
 const { I18N_LOCALES, LOCALE_LABELS, getAllKeys } = require('./i18n-seeds');
+const sec = require('./lib/security');
+const { stripText, stripMultiline } = sec;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,25 +41,59 @@ function asyncHandler(fn) {
   return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 }
 
-app.set('trust proxy', 1);
+app.disable('x-powered-by');
+
+// Number of reverse proxies in front of the app (0 = app is exposed directly).
+// Trusting X-Forwarded-For without a real proxy lets clients spoof their IP and bypass rate limits.
+function parseTrustProxy(raw) {
+  const v = String(raw ?? '').trim().toLowerCase();
+  if (v === '' || v === '0' || v === 'false') return false;
+  if (v === 'true') return 1;
+  if (/^\d+$/.test(v)) return Number(v);
+  return raw;
+}
+app.set('trust proxy', parseTrustProxy(process.env.TRUST_PROXY));
 
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        scriptSrcAttr: ["'none'"],
+        // Pages use inline style attributes; scripts stay strictly same-origin.
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+        fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'"],
+        frameSrc: ["'self'", 'https:'],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'self'"],
+        upgradeInsecureRequests: null,
+      },
+    },
     crossOriginEmbedderPolicy: false,
   })
 );
 
 app.use(express.json({ limit: '512kb' }));
-app.use(express.urlencoded({ extended: true, limit: '512kb' }));
+app.use(express.urlencoded({ extended: false, limit: '64kb' }));
 
 const sessionSecret =
   process.env.SESSION_SECRET || (isProd ? null : 'dev-only-change-in-production');
 
-if (!sessionSecret) {
-  console.error('Set SESSION_SECRET in production.');
+if (!sessionSecret || (isProd && sec.isWeakSecret(sessionSecret))) {
+  console.error(
+    'SESSION_SECRET must be set to a random value of at least 32 characters in production ' +
+      '(generate one with: openssl rand -hex 48).'
+  );
   process.exit(1);
 }
+
+// Secure cookies need HTTPS. Set COOKIE_SECURE=false only for plain-HTTP internal testing.
+const cookieSecure = process.env.COOKIE_SECURE ? process.env.COOKIE_SECURE !== 'false' : isProd;
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 
@@ -105,7 +142,7 @@ async function createSessionMiddleware() {
     cookie: {
       httpOnly: true,
       sameSite: 'lax',
-      secure: isProd,
+      secure: cookieSecure,
       maxAge: 1000 * 60 * 60 * 8,
     },
   });
@@ -177,7 +214,27 @@ const blogSearchLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+app.get('/healthz', (_req, res) => {
+  q1('SELECT 1 AS ok')
+    .then(() => res.json({ ok: true }))
+    .catch(() => res.status(503).json({ ok: false }));
+});
+
+// Admin responses (sessions, messages, subscriber lists) must never be cached by browsers or proxies.
+app.use('/api/admin', (_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  next();
+});
+
 app.use('/api/', publicLimiter);
+
+// Every ":id" route parameter must be a positive integer (otherwise NaN reaches Postgres and returns 500).
+app.param('id', (req, res, next, val) => {
+  if (sec.parsePositiveInt(val) === null) {
+    return res.status(400).json({ ok: false, error: 'Invalid id' });
+  }
+  next();
+});
 
 function adminDisplayName(req) {
   return String((req.session && req.session.adminUsername) || 'admin').slice(0, 200);
@@ -189,17 +246,22 @@ function logAdminFire(req, action, entityType, entityId, details) {
   );
 }
 
+/** Returns the admin row when the session is a fully authenticated, still-valid admin session. */
+async function validAdminSession(req) {
+  if (!(req.session && req.session.adminId === 1)) return null;
+  const row = await q1('SELECT username, session_epoch FROM admin_user WHERE id = 1');
+  if (!row || Number(row.session_epoch) !== Number(req.session.epoch || 0)) return null;
+  if (!req.session.adminUsername) req.session.adminUsername = row.username;
+  return row;
+}
+
 function requireAdmin(req, res, next) {
-  if (!(req.session && req.session.adminId === 1)) {
-    return res.status(401).json({ ok: false, error: 'Unauthorized' });
-  }
-  if (req.session.adminUsername) return next();
-  q1('SELECT username FROM admin_user WHERE id = 1')
+  validAdminSession(req)
     .then((row) => {
-      if (row && row.username) req.session.adminUsername = row.username;
+      if (!row) return res.status(401).json({ ok: false, error: 'Unauthorized' });
       next();
     })
-    .catch(() => next());
+    .catch(next);
 }
 
 function totpIssuer() {
@@ -213,17 +275,18 @@ function isTotpEnabledRow(row) {
   return on && String(row.totp_secret || '').trim().length > 0;
 }
 
-function verifyTotpToken(secretBase32, token) {
+/** Returns the matched 30-second time step, or null when the code is invalid. */
+function verifyTotpStep(secretBase32, token) {
   const secret = String(secretBase32 || '').replace(/\s/g, '');
   const t = String(token || '').replace(/\s/g, '');
-  if (!secret || !/^\d{6}$/.test(t)) return false;
-  return speakeasy.totp.verify({
-    secret,
-    encoding: 'base32',
-    token: t,
-    window: 1,
-  });
+  if (!secret || !/^\d{6}$/.test(t)) return null;
+  const hit = speakeasy.totp.verifyDelta({ secret, encoding: 'base32', token: t, window: 1 });
+  if (!hit) return null;
+  return Math.floor(Date.now() / 1000 / 30) + hit.delta;
 }
+
+const TOTP_CHALLENGE_TTL_MS = 5 * 60 * 1000;
+const TOTP_MAX_ATTEMPTS = 5;
 
 const ANALYTICS_CONSENT_COOKIE = 'ac_analytics';
 
@@ -250,7 +313,7 @@ function setAnalyticsConsentCookie(res) {
     
     const maxAge = 60 * 60 * 24 * 400;
     const bits = [`${ANALYTICS_CONSENT_COOKIE}=1`, 'Path=/', `Max-Age=${maxAge}`, 'SameSite=Lax', 'HttpOnly'];
-    if (isProd) bits.push('Secure');
+    if (cookieSecure) bits.push('Secure');
     res.setHeader('Set-Cookie', bits.join('; '));
 }
 
@@ -274,24 +337,6 @@ function deviceTypeFromUa(ua) {
   return 'desktop';
 }
 
-function normalizeTrackPath(input) {
-  let s = String(input || '/').trim().replace(/\0/g, '').slice(0, 512);
-  if (!s.startsWith('/')) s = `/${s}`;
-  return s || '/';
-}
-
-function sanitizeReferrer(input) {
-  const raw = String(input || '').trim().replace(/\0/g, '').slice(0, 1024);
-  if (!raw) return '';
-  try {
-    const u = new URL(raw);
-    if (u.protocol !== 'http:' && u.protocol !== 'https:') return '';
-    return `${u.origin}${u.pathname}${u.search}${u.hash}`.slice(0, 1024);
-  } catch {
-    return '';
-  }
-}
-
 function generateSubscriberToken() {
   return crypto.randomBytes(32).toString('hex');
 }
@@ -303,8 +348,20 @@ function newsletterPublicSiteBase() {
   return raw;
 }
 
+function escapeHtmlText(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function newsletterUnsubscribeUrl(siteBase, token) {
+  return `${siteBase}/unsubscribe.html?token=${encodeURIComponent(token)}`;
+}
+
 function newsletterUnsubscribeFooterHtml(siteBase, token) {
-  const url = `${siteBase}/unsubscribe.html?token=${encodeURIComponent(token)}`;
+  const url = escapeHtmlText(newsletterUnsubscribeUrl(siteBase, token));
   return `<div style="margin-top:2rem;padding-top:1.5rem;border-top:1px solid #e5e7eb;font-size:13px;line-height:1.5;color:#6b7280;font-family:system-ui,-apple-system,sans-serif;">
   <p style="margin:0 0 0.5rem">You are subscribed to our newsletter.</p>
   <p style="margin:0"><a href="${url}" style="color:#2563eb">Unsubscribe</a></p>
@@ -315,47 +372,101 @@ function buildNewsletterEmailHtml(bodyHtml, siteBase, token) {
   return String(bodyHtml || '') + newsletterUnsubscribeFooterHtml(siteBase, token);
 }
 
+function newsletterEmailConfig() {
+  const apiKey = String(process.env.RESEND_API_KEY || '').trim();
+  const from = String(process.env.RESEND_FROM_EMAIL || '').trim();
+  const siteBase = newsletterPublicSiteBase();
+  return { apiKey, from, siteBase, ready: !!(apiKey && from && siteBase) };
+}
+
+const NEWSLETTER_CONFIRM_COOLDOWN_MS = 10 * 60 * 1000;
+
+async function sendNewsletterConfirmation(email, token) {
+  const cfg = newsletterEmailConfig();
+  const url = `${cfg.siteBase}/confirm.html?token=${encodeURIComponent(token)}`;
+  if (!cfg.ready) {
+    // Development only: no mail provider configured, so surface the link in the server log.
+    console.log(`[newsletter] confirmation link for ${email}: ${url}`);
+    return true;
+  }
+  const resend = new Resend(cfg.apiKey);
+  const safeUrl = escapeHtmlText(url);
+  const { error } = await resend.emails.send({
+    from: cfg.from,
+    to: email,
+    subject: 'Please confirm your newsletter subscription',
+    html: `<div style="font-family:system-ui,-apple-system,sans-serif;font-size:15px;line-height:1.6;color:#111827">
+  <p>Please confirm that you want to receive our newsletter.</p>
+  <p><a href="${safeUrl}" style="display:inline-block;padding:10px 18px;background:#2563eb;color:#fff;border-radius:8px;text-decoration:none">Confirm subscription</a></p>
+  <p style="color:#6b7280;font-size:13px">If you did not request this, you can ignore this email and nothing will happen.</p>
+</div>`,
+  });
+  return !error;
+}
+
+const ADMIN_UPLOAD_MIMES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
+
+const CONTACT_UPLOAD_MIMES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]);
+
+// The stored extension comes from the validated MIME type, never from the client-supplied file name.
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadsDir),
   filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname || '').slice(0, 8) || '.bin';
-    const safe = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}${ext}`;
-    cb(null, safe);
+    const ext = sec.extForMime(file.mimetype);
+    if (!ext) return cb(new Error('Invalid file type'));
+    cb(null, `${Date.now()}-${crypto.randomBytes(8).toString('hex')}${ext}`);
   },
 });
 
 const upload = multer({
   storage,
-  limits: { fileSize: 2 * 1024 * 1024 },
+  limits: { fileSize: 2 * 1024 * 1024, files: 1 },
   fileFilter: (_req, file, cb) => {
-    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml'];
-    if (allowed.includes(file.mimetype)) return cb(null, true);
+    if (ADMIN_UPLOAD_MIMES.has(file.mimetype)) return cb(null, true);
     cb(new Error('Invalid file type'));
   },
 });
 
 const contactUpload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 10 },
   fileFilter: (_req, file, cb) => {
-    const allowed = new Set([
-      'image/jpeg',
-      'image/png',
-      'image/webp',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    ]);
-    if (allowed.has(file.mimetype)) return cb(null, true);
+    if (CONTACT_UPLOAD_MIMES.has(file.mimetype)) return cb(null, true);
     cb(new Error('Attachment type not allowed (images, PDF, Word)'));
   },
 });
 
-function stripText(s, max) {
-  return String(s ?? '')
-    .replace(/[\u0000-\u001F\u007F]/g, '')
-    .trim()
-    .slice(0, max);
+/** Verifies the stored bytes really are what the client claimed; deletes the file when they are not. */
+async function verifyUploadedFile(file) {
+  if (!file) return true;
+  const ok = await sec.fileMatchesMime(file.path, file.mimetype);
+  if (!ok) await sec.removeFileQuietly(file.path);
+  return ok;
+}
+
+function sortOrder(v) {
+  const n = Math.trunc(Number(v));
+  return Number.isFinite(n) ? Math.max(-1000000, Math.min(1000000, n)) : 0;
+}
+
+/** CSV cell that cannot be interpreted as a spreadsheet formula (CSV/formula injection). */
+function csvCell(s) {
+  let v = String(s ?? '');
+  if (/^[=+\-@\t\r]/.test(v)) v = `'${v}`;
+  return `"${v.replace(/"/g, '""')}"`;
 }
 
 function parseBanners(raw) {
@@ -404,10 +515,10 @@ async function applyTranslations(site, locale) {
 async function publicSitePayload() {
   const kv = await getKvMap();
   const banners = parseBanners(kv.banners_json).map((b) => ({
-    image: b.image || '',
+    image: sec.safeMediaUrl(b.image),
     title: b.title || '',
     subtitle: b.subtitle || '',
-    link: b.link || '',
+    link: sec.safeLink(b.link),
     linkText: b.linkText || '',
   }));
   return {
@@ -415,17 +526,17 @@ async function publicSitePayload() {
     hero: {
       title: kv.hero_title || '',
       subtitle: kv.hero_subtitle || '',
-      image: kv.hero_image || '',
-      ctaPrimary: { text: kv.hero_cta_primary_text || '', link: kv.hero_cta_primary_link || '#' },
+      image: sec.safeMediaUrl(kv.hero_image),
+      ctaPrimary: { text: kv.hero_cta_primary_text || '', link: sec.safeLink(kv.hero_cta_primary_link) || '#' },
       ctaSecondary: {
         text: kv.hero_cta_secondary_text || '',
-        link: kv.hero_cta_secondary_link || '#',
+        link: sec.safeLink(kv.hero_cta_secondary_link) || '#',
       },
     },
     homeAbout: {
       title: kv.home_about_title || '',
       text: kv.home_about_text || '',
-      image: kv.home_about_image || '',
+      image: sec.safeMediaUrl(kv.home_about_image),
     },
     aboutPage: {
       title: kv.about_page_title || '',
@@ -453,7 +564,7 @@ function projectRowPublic(r) {
     shortDesc: r.short_desc,
     longDesc: r.long_desc,
     image: r.image,
-    linkUrl: r.link_url,
+    linkUrl: sec.safeLink(r.link_url, 800),
     featured: r.featured,
     sortOrder: r.sort_order,
     viewCount: r.view_count,
@@ -502,7 +613,7 @@ app.get(
     const kv = await getKvMap();
     res.json({
       ok: true,
-      mapEmbedUrl: kv.contact_map_embed_url || '',
+      mapEmbedUrl: sec.safeEmbedUrl(kv.contact_map_embed_url),
     });
   })
 );
@@ -511,9 +622,7 @@ app.post(
   '/api/public/track-visit',
   trackLimiter,
   asyncHandler(async (_req, res) => {
-    const kv = await getKvMap();
-    const n = Math.max(0, Number(kv.visitor_count || 0)) + 1;
-    await setKv('visitor_count', String(n));
+    const n = await incrementKv('visitor_count');
     res.json({ ok: true, visitorCount: n });
   })
 );
@@ -534,8 +643,9 @@ app.post(
     if (getCookie(req, ANALYTICS_CONSENT_COOKIE) !== '1') {
       return res.json({ ok: true, skipped: true });
     }
-    const path = normalizeTrackPath(req.body && req.body.path);
-    const referrer = sanitizeReferrer((req.body && req.body.referrer) || req.get('Referer') || '');
+    const path = sec.normalizeTrackPath(req.body && req.body.path);
+    if (!path) return res.json({ ok: true, skipped: true });
+    const referrer = sec.sanitizeReferrer((req.body && req.body.referrer) || req.get('Referer') || '');
     const ua = req.get('User-Agent') || '';
     const deviceType = deviceTypeFromUa(ua);
     const ipHash = hashIpForAnalytics(clientIp(req));
@@ -749,32 +859,41 @@ app.get(
 );
 
 async function handleContactSubmission(req, res) {
+  const reject = async (status, error) => {
+    // Uploaded attachment is only kept for accepted submissions.
+    if (req.file) await sec.removeFileQuietly(req.file.path);
+    return res.status(status).json({ ok: false, error });
+  };
+
   const name = stripText(req.body.name, 120);
   const email = String(req.body.email || '').trim().slice(0, 120).toLowerCase();
   const phone = stripText(req.body.phone, 40);
-  const message = stripText(req.body.message, 4000);
+  const message = stripMultiline(req.body.message, 4000);
+
+  if (!name || name.length < 2) return reject(400, 'Please enter your name.');
+  if (!validator.isEmail(email)) return reject(400, 'Please enter a valid email.');
+  if (!message || message.length < 10) return reject(400, 'Please enter a longer message.');
+
   let attachment_path = '';
   let attachment_name = '';
   if (req.file) {
+    if (!(await verifyUploadedFile(req.file))) {
+      return res.status(400).json({ ok: false, error: 'The attachment does not match its file type.' });
+    }
     attachment_path = `/uploads/${req.file.filename}`;
     attachment_name = stripText(req.file.originalname, 240);
   }
 
-  if (!name || name.length < 2) {
-    return res.status(400).json({ ok: false, error: 'Please enter your name.' });
+  try {
+    await query(
+      `INSERT INTO contact_messages (name, email, phone, message, attachment_path, attachment_name)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [name, email, phone, message, attachment_path, attachment_name]
+    );
+  } catch (e) {
+    if (req.file) await sec.removeFileQuietly(req.file.path);
+    throw e;
   }
-  if (!validator.isEmail(email)) {
-    return res.status(400).json({ ok: false, error: 'Please enter a valid email.' });
-  }
-  if (!message || message.length < 10) {
-    return res.status(400).json({ ok: false, error: 'Please enter a longer message.' });
-  }
-
-  await query(
-    `INSERT INTO contact_messages (name, email, phone, message, attachment_path, attachment_name)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [name, email, phone, message, attachment_path, attachment_name]
-  );
 
   res.json({ ok: true });
 }
@@ -796,41 +915,45 @@ app.post(
   asyncHandler((req, res) => handleContactSubmission(req, res))
 );
 
+const DUMMY_HASH = bcrypt.hashSync('dummy-password-for-constant-time', 12);
+
+function regenerateSession(req) {
+  return new Promise((resolve, reject) => {
+    req.session.regenerate((err) => (err ? reject(err) : resolve()));
+  });
+}
+
 app.post(
   '/api/admin/login',
   loginLimiter,
   asyncHandler(async (req, res) => {
-    const username = String(req.body.username || '').trim();
-    const password = String(req.body.password || '');
+    const username = String(req.body.username || '').trim().slice(0, 200);
+    const password = String(req.body.password || '').slice(0, 500);
 
     const row = await q1(
-      'SELECT id, username, password_hash, totp_secret, totp_enabled FROM admin_user WHERE id = 1'
+      'SELECT id, username, password_hash, totp_secret, totp_enabled, session_epoch FROM admin_user WHERE id = 1'
     );
     if (!row) return res.status(500).json({ ok: false, error: 'Server misconfigured' });
 
+    // Always run one bcrypt comparison (async, so the event loop is not blocked) to keep timing uniform.
     const userOk = username === row.username;
-    const passOk = bcrypt.compareSync(password, row.password_hash);
+    const passOk = await bcrypt.compare(password, userOk ? row.password_hash : DUMMY_HASH);
 
     if (!userOk || !passOk) {
       return res.status(401).json({ ok: false, error: 'Invalid credentials' });
     }
 
+    await regenerateSession(req);
     if (isTotpEnabledRow(row)) {
-      req.session.regenerate((err) => {
-        if (err) return res.status(500).json({ ok: false, error: 'Session error' });
-        req.session.totpChallenge = true;
-        res.json({ ok: true, needTotp: true });
-      });
-      return;
+      req.session.totpChallenge = { at: Date.now(), attempts: 0 };
+      return res.json({ ok: true, needTotp: true });
     }
 
-    req.session.regenerate((err) => {
-      if (err) return res.status(500).json({ ok: false, error: 'Session error' });
-      req.session.adminId = row.id;
-      req.session.adminUsername = row.username;
-      res.json({ ok: true });
-      logActivity(row.username, 'login', 'session', '', 'Login success').catch(() => {});
-    });
+    req.session.adminId = row.id;
+    req.session.adminUsername = row.username;
+    req.session.epoch = Number(row.session_epoch);
+    res.json({ ok: true });
+    logActivity(row.username, 'login', 'session', '', 'Login success').catch(() => {});
   })
 );
 
@@ -850,19 +973,37 @@ app.post(
   '/api/admin/login/totp',
   totpLoginLimiter,
   asyncHandler(async (req, res) => {
-    if (!req.session || !req.session.totpChallenge) {
+    const challenge = req.session && req.session.totpChallenge;
+    if (!challenge || typeof challenge !== 'object') {
       return res.status(401).json({ ok: false, error: 'No authentication challenge in progress.' });
     }
+    if (Date.now() - challenge.at > TOTP_CHALLENGE_TTL_MS || challenge.attempts >= TOTP_MAX_ATTEMPTS) {
+      await new Promise((resolve) => req.session.destroy(() => resolve()));
+      return res.status(401).json({ ok: false, error: 'Authentication expired. Please sign in again.' });
+    }
+    challenge.attempts += 1;
+
     const token = String(req.body.token || '').replace(/\s/g, '');
     const row = await q1(
-      'SELECT id, username, totp_secret, totp_enabled FROM admin_user WHERE id = 1'
+      'SELECT id, username, totp_secret, totp_enabled, totp_last_step, session_epoch FROM admin_user WHERE id = 1'
     );
-    if (!row || !isTotpEnabledRow(row) || !verifyTotpToken(row.totp_secret, token)) {
+    const step = row && isTotpEnabledRow(row) ? verifyTotpStep(row.totp_secret, token) : null;
+    if (step === null || step <= Number(row.totp_last_step || 0)) {
       return res.status(401).json({ ok: false, error: 'Invalid authentication code.' });
     }
-    delete req.session.totpChallenge;
+    // A code can only be used once: the step is stored atomically and must move forward.
+    const claimed = await query(
+      'UPDATE admin_user SET totp_last_step = ? WHERE id = 1 AND totp_last_step < ? RETURNING id',
+      [step, step]
+    );
+    if (!claimed.rows.length) {
+      return res.status(401).json({ ok: false, error: 'Invalid authentication code.' });
+    }
+
+    await regenerateSession(req);
     req.session.adminId = row.id;
     req.session.adminUsername = row.username;
+    req.session.epoch = Number(row.session_epoch);
     res.json({ ok: true });
     logActivity(row.username, 'login', 'session', '', 'Login success (2FA)').catch(() => {});
   })
@@ -884,7 +1025,7 @@ app.post(
 app.get(
   '/api/admin/session',
   asyncHandler(async (req, res) => {
-    const authed = !!(req.session && req.session.adminId === 1);
+    const authed = !!(await validAdminSession(req));
     const needTotp = !!(req.session && req.session.totpChallenge && !authed);
     res.json({ ok: true, authed, needTotp });
   })
@@ -902,7 +1043,7 @@ app.get(
 app.get(
   '/api/admin/2fa/setup',
   requireAdmin,
-  asyncHandler(async (_req, res) => {
+  asyncHandler(async (req, res) => {
     const row = await q1('SELECT username FROM admin_user WHERE id = 1');
     const issuer = totpIssuer();
     const account = String((row && row.username) || 'admin').slice(0, 80);
@@ -911,6 +1052,7 @@ app.get(
       issuer,
       length: 32,
     });
+    req.session.pendingTotpSecret = secret.base32;
     const qrDataUrl = await QRCode.toDataURL(secret.otpauth_url, {
       margin: 1,
       width: 220,
@@ -929,17 +1071,18 @@ app.post(
   '/api/admin/2fa/enable',
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const secret = String(req.body.secret || '')
-      .replace(/\s/g, '')
-      .slice(0, 200);
+    // The secret comes from the server-side session (issued by /2fa/setup), never from the client.
+    const secret = String(req.session.pendingTotpSecret || '');
     const token = String(req.body.token || '').replace(/\s/g, '');
-    if (!secret || !verifyTotpToken(secret, token)) {
-      return res.status(400).json({ ok: false, error: 'Invalid code or secret.' });
+    const step = secret ? verifyTotpStep(secret, token) : null;
+    if (step === null) {
+      return res.status(400).json({ ok: false, error: 'Invalid code, or setup expired. Show the QR code again.' });
     }
     await query(
-      `UPDATE admin_user SET totp_secret = ?, totp_enabled = TRUE WHERE id = 1`,
-      [secret]
+      `UPDATE admin_user SET totp_secret = ?, totp_enabled = TRUE, totp_last_step = ? WHERE id = 1`,
+      [secret, step]
     );
+    delete req.session.pendingTotpSecret;
     logAdminFire(req, '2fa_enable', 'admin_user', '1', 'TOTP enabled');
     res.json({ ok: true });
   })
@@ -951,14 +1094,42 @@ app.post(
   asyncHandler(async (req, res) => {
     const password = String(req.body.password || '');
     const row = await q1('SELECT password_hash FROM admin_user WHERE id = 1');
-    if (!row || !bcrypt.compareSync(password, row.password_hash)) {
+    if (!row || !(await bcrypt.compare(password.slice(0, 500), row.password_hash))) {
       return res.status(400).json({ ok: false, error: 'Invalid password.' });
     }
     await query(
-      `UPDATE admin_user SET totp_secret = '', totp_enabled = FALSE WHERE id = 1`,
+      `UPDATE admin_user SET totp_secret = '', totp_enabled = FALSE, totp_last_step = 0 WHERE id = 1`,
       []
     );
     logAdminFire(req, '2fa_disable', 'admin_user', '1', 'TOTP disabled');
+    res.json({ ok: true });
+  })
+);
+
+app.post(
+  '/api/admin/password',
+  requireAdmin,
+  totpLoginLimiter,
+  asyncHandler(async (req, res) => {
+    const current = String(req.body.currentPassword || '').slice(0, 500);
+    const next = String(req.body.newPassword || '');
+    const row = await q1('SELECT password_hash FROM admin_user WHERE id = 1');
+    if (!row || !(await bcrypt.compare(current, row.password_hash))) {
+      return res.status(400).json({ ok: false, error: 'Current password is incorrect.' });
+    }
+    const problem = sec.passwordProblem(next);
+    if (problem) return res.status(400).json({ ok: false, error: problem });
+    if (next === current) {
+      return res.status(400).json({ ok: false, error: 'The new password must be different.' });
+    }
+    const hash = await bcrypt.hash(next, 12);
+    const upd = await q1(
+      'UPDATE admin_user SET password_hash = ?, session_epoch = session_epoch + 1 WHERE id = 1 RETURNING session_epoch',
+      [hash]
+    );
+    // Every other session is now invalid; keep this one signed in.
+    req.session.epoch = Number(upd.session_epoch);
+    logAdminFire(req, 'password_change', 'admin_user', '1', 'Admin password changed');
     res.json({ ok: true });
   })
 );
@@ -1048,6 +1219,17 @@ app.get(
   })
 );
 
+const SITE_LINK_KEYS = new Set(['hero_cta_primary_link', 'hero_cta_secondary_link']);
+const SITE_MEDIA_KEYS = new Set(['hero_image', 'home_about_image']);
+const SITE_MULTILINE_KEYS = new Set([
+  'hero_subtitle',
+  'home_about_text',
+  'about_page_body',
+  'about_mission',
+  'about_values',
+  'home_projects_intro',
+]);
+
 app.put(
   '/api/admin/site',
   requireAdmin,
@@ -1092,11 +1274,11 @@ app.put(
         }
         if (!Array.isArray(parsed)) continue;
         const clean = parsed.slice(0, 6).map((b) => ({
-          image: String(b.image || '').slice(0, 500),
-          title: stripText(b.title, 160),
-          subtitle: stripText(b.subtitle, 240),
-          link: String(b.link || '').slice(0, 500),
-          linkText: stripText(b.linkText, 80),
+          image: sec.safeMediaUrl(b && b.image),
+          title: stripText(b && b.title, 160),
+          subtitle: stripText(b && b.subtitle, 240),
+          link: sec.safeLink(b && b.link),
+          linkText: stripText(b && b.linkText, 80),
         }));
         v = JSON.stringify(clean);
       } else if (k === 'feature_flags_json') {
@@ -1115,8 +1297,16 @@ app.put(
         } catch {
           continue;
         }
+      } else if (SITE_LINK_KEYS.has(k)) {
+        v = sec.safeLink(v, 500);
+      } else if (SITE_MEDIA_KEYS.has(k)) {
+        v = sec.safeMediaUrl(v, 500);
+      } else if (k === 'contact_map_embed_url') {
+        v = sec.safeEmbedUrl(v, 800);
+      } else if (SITE_MULTILINE_KEYS.has(k)) {
+        v = stripMultiline(v, 8000);
       } else {
-        v = String(v ?? '').slice(0, 8000);
+        v = stripText(v, 8000);
       }
       await setKv(k, v);
     }
@@ -1146,10 +1336,10 @@ app.post(
     if (!slug) slug = slugify(title);
 
     const short_desc = stripText(req.body.short_desc, 600);
-    const long_desc = stripText(req.body.long_desc, 12000);
+    const long_desc = stripMultiline(req.body.long_desc, 12000);
     const icon = stripText(req.body.icon, 40);
-    const image = String(req.body.image || '').slice(0, 500);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const image = sec.safeMediaUrl(req.body.image, 500);
+    const sort_order = sortOrder(req.body.sort_order);
     const featured = req.body.featured ? 1 : 0;
 
     try {
@@ -1185,10 +1375,10 @@ app.put(
     if (!slug) slug = slugify(title);
 
     const short_desc = stripText(req.body.short_desc, 600);
-    const long_desc = stripText(req.body.long_desc, 12000);
+    const long_desc = stripMultiline(req.body.long_desc, 12000);
     const icon = stripText(req.body.icon, 40) || 'layers';
-    const image = String(req.body.image || '').slice(0, 500);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const image = sec.safeMediaUrl(req.body.image, 500);
+    const sort_order = sortOrder(req.body.sort_order);
     const featured = req.body.featured ? 1 : 0;
 
     try {
@@ -1227,9 +1417,9 @@ app.post(
     const name = stripText(req.body.name, 120);
     if (!name) return res.status(400).json({ ok: false, error: 'Name required' });
     const role = stripText(req.body.role, 160);
-    const bio = stripText(req.body.bio, 4000);
-    const image = String(req.body.image || '').slice(0, 500);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const bio = stripMultiline(req.body.bio, 4000);
+    const image = sec.safeMediaUrl(req.body.image, 500);
+    const sort_order = sortOrder(req.body.sort_order);
 
     const ins = await query(
       `INSERT INTO team_members (name, role, bio, image, sort_order) VALUES (?, ?, ?, ?, ?)
@@ -1253,9 +1443,9 @@ app.put(
     const name = stripText(req.body.name, 120);
     if (!name) return res.status(400).json({ ok: false, error: 'Name required' });
     const role = stripText(req.body.role, 160);
-    const bio = stripText(req.body.bio, 4000);
-    const image = String(req.body.image || '').slice(0, 500);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const bio = stripMultiline(req.body.bio, 4000);
+    const image = sec.safeMediaUrl(req.body.image, 500);
+    const sort_order = sortOrder(req.body.sort_order);
 
     await query(
       `UPDATE team_members SET name = ?, role = ?, bio = ?, image = ?, sort_order = ?, updated_at = NOW()
@@ -1309,7 +1499,7 @@ app.get(
       `SELECT id, name, email, phone, message, is_read, created_at, attachment_path, attachment_name
        FROM contact_messages ORDER BY id DESC`
     );
-    const cell = (s) => `"${String(s ?? '').replace(/"/g, '""')}"`;
+    const cell = csvCell;
     const lines = [
       ['id', 'name', 'email', 'phone', 'is_read', 'created_at', 'attachment_name', 'attachment_path', 'message'].join(
         ','
@@ -1350,64 +1540,89 @@ app.post(
     if (!email || !validator.isEmail(email)) {
       return res.status(400).json({ ok: false, error: 'Please enter a valid email address.' });
     }
-
-    const existing = await q1(`SELECT id, status FROM subscribers WHERE email = ?`, [email]);
-    if (existing) {
-      if (existing.status === 'unsubscribed') {
-        let token = generateSubscriberToken();
-        try {
-          await query(
-            `UPDATE subscribers SET status = 'active', token = ?, unsubscribed_at = NULL WHERE id = ?`,
-            [token, existing.id]
-          );
-        } catch (e) {
-          if (isUniqueViolation(e)) {
-            token = generateSubscriberToken();
-            await query(
-              `UPDATE subscribers SET status = 'active', token = ?, unsubscribed_at = NULL WHERE id = ?`,
-              [token, existing.id]
-            );
-          } else throw e;
-        }
-      }
-      return res.json({ ok: true });
+    if (isProd && !newsletterEmailConfig().ready) {
+      return res.status(503).json({ ok: false, error: 'Newsletter signup is temporarily unavailable.' });
     }
 
-    let attempts = 0;
-    while (attempts < 4) {
-      attempts += 1;
-      const token = generateSubscriberToken();
+    // Same answer for every outcome so the form cannot be used to discover who is subscribed.
+    const generic = { ok: true, pending: true };
+    const existing = await q1(`SELECT id, status, confirm_sent_at FROM subscribers WHERE email = ?`, [email]);
+    if (existing && existing.status === 'active') return res.json(generic);
+    if (
+      existing &&
+      existing.confirm_sent_at &&
+      Date.now() - new Date(existing.confirm_sent_at).getTime() < NEWSLETTER_CONFIRM_COOLDOWN_MS
+    ) {
+      return res.json(generic);
+    }
+
+    const confirmToken = generateSubscriberToken();
+    if (existing) {
+      await query(
+        `UPDATE subscribers SET status = 'pending', confirm_token = ?, confirm_sent_at = NOW(), unsubscribed_at = NULL
+         WHERE id = ?`,
+        [confirmToken, existing.id]
+      );
+    } else {
       try {
         await query(
-          `INSERT INTO subscribers (email, status, token) VALUES (?, 'active', ?)`,
-          [email, token]
+          `INSERT INTO subscribers (email, status, token, confirm_token, confirm_sent_at)
+           VALUES (?, 'pending', ?, ?, NOW())`,
+          [email, generateSubscriberToken(), confirmToken]
         );
-        return res.json({ ok: true });
       } catch (e) {
-        if (isUniqueViolation(e)) {
-          const again = await q1(`SELECT id FROM subscribers WHERE email = ?`, [email]);
-          if (again) return res.json({ ok: true });
-          continue;
-        }
+        if (isUniqueViolation(e)) return res.json(generic);
         throw e;
       }
     }
-    res.status(500).json({ ok: false, error: 'Could not save subscription.' });
+
+    let sent = false;
+    try {
+      sent = await sendNewsletterConfirmation(email, confirmToken);
+    } catch (e) {
+      console.error('[newsletter] confirmation email failed:', e && e.message ? e.message : e);
+    }
+    if (!sent) {
+      return res.status(502).json({ ok: false, error: 'Could not send the confirmation email. Try again later.' });
+    }
+    res.json(generic);
   })
 );
 
-app.get(
-  '/api/public/newsletter/unsubscribe',
+app.post(
+  '/api/public/newsletter/confirm',
+  newsletterPublicLimiter,
   asyncHandler(async (req, res) => {
-    const token = String(req.query.token || '')
+    const token = String((req.body && req.body.token) || '').trim().slice(0, 128);
+    if (!token) return res.status(400).json({ ok: false, error: 'Missing token.' });
+    const updated = await query(
+      `UPDATE subscribers SET status = 'active', confirmed_at = NOW(), confirm_token = NULL
+       WHERE confirm_token = ? AND status = 'pending' AND confirm_sent_at > NOW() - INTERVAL '3 days'
+       RETURNING id`,
+      [token]
+    );
+    if (!updated.rows.length) {
+      return res.status(404).json({ ok: false, error: 'This confirmation link is invalid or has expired.' });
+    }
+    res.json({ ok: true });
+  })
+);
+
+// POST only: link scanners and mail previewers issue GET requests and must not unsubscribe anyone.
+// Also serves RFC 8058 one-click unsubscribe (token in the query string, form body "List-Unsubscribe=One-Click").
+app.post(
+  '/api/public/newsletter/unsubscribe',
+  newsletterPublicLimiter,
+  asyncHandler(async (req, res) => {
+    const token = String((req.body && req.body.token) || req.query.token || '')
       .trim()
       .slice(0, 128);
     if (!token) {
       return res.status(400).json({ ok: false, error: 'Missing token.' });
     }
     const updated = await query(
-      `UPDATE subscribers SET status = 'unsubscribed', unsubscribed_at = NOW()
-       WHERE token = ? AND status = 'active' RETURNING id`,
+      `UPDATE subscribers SET status = 'unsubscribed', unsubscribed_at = NOW(), confirm_token = NULL
+       WHERE token = ? AND status IN ('active', 'pending') RETURNING id`,
       [token]
     );
     if (updated.rows.length > 0) {
@@ -1428,7 +1643,7 @@ app.get(
     const page = Math.max(1, parseInt(String(req.query.page || '1'), 10) || 1);
     const limit = Math.min(100, Math.max(1, parseInt(String(req.query.limit || '50'), 10) || 50));
     const statusRaw = String(req.query.status || '').toLowerCase();
-    const statusFilter = statusRaw === 'active' || statusRaw === 'unsubscribed' ? statusRaw : null;
+    const statusFilter = ['active', 'pending', 'unsubscribed'].includes(statusRaw) ? statusRaw : null;
     const offset = (page - 1) * limit;
 
     const args = [];
@@ -1475,7 +1690,7 @@ app.get(
     const rows = await qr(
       `SELECT email, status, created_at FROM subscribers WHERE status = 'active' ORDER BY created_at ASC, id ASC`
     );
-    const cell = (s) => `"${String(s ?? '').replace(/"/g, '""')}"`;
+    const cell = csvCell;
     const lines = [['email', 'status', 'created_at'].join(',')];
     for (const r of rows) {
       lines.push([r.email, r.status, r.created_at].map(cell).join(','));
@@ -1487,34 +1702,85 @@ app.get(
   })
 );
 
+const NEWSLETTER_BATCH_SIZE = 100;
+const NEWSLETTER_BATCH_PAUSE_MS = 700;
+let newsletterJob = { sending: false, last: null };
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function runNewsletterJob(adminName, cfg, subject, htmlBody, rows) {
+  const resend = new Resend(cfg.apiKey);
+  let sent = 0;
+  let failed = 0;
+  try {
+    for (let i = 0; i < rows.length; i += NEWSLETTER_BATCH_SIZE) {
+      const chunk = rows.slice(i, i + NEWSLETTER_BATCH_SIZE);
+      const payload = chunk.map((row) => ({
+        from: cfg.from,
+        to: [row.email],
+        subject,
+        html: buildNewsletterEmailHtml(htmlBody, cfg.siteBase, row.token),
+        headers: {
+          'List-Unsubscribe': `<${newsletterUnsubscribeUrl(cfg.siteBase, row.token)}>`,
+          'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+        },
+      }));
+      try {
+        const { error } = await resend.batch.send(payload);
+        if (error) failed += chunk.length;
+        else sent += chunk.length;
+      } catch {
+        failed += chunk.length;
+      }
+      newsletterJob.sent = sent;
+      newsletterJob.failed = failed;
+      if (i + NEWSLETTER_BATCH_SIZE < rows.length) await sleep(NEWSLETTER_BATCH_PAUSE_MS);
+    }
+  } finally {
+    newsletterJob = {
+      sending: false,
+      last: { total: rows.length, sent, failed, finishedAt: new Date().toISOString() },
+    };
+    logActivity(
+      adminName,
+      'newsletter_send',
+      'newsletter',
+      '',
+      `subject="${subject.slice(0, 160)}" recipients=${rows.length} sent=${sent} failed=${failed}`
+    ).catch(() => {});
+  }
+}
+
 app.post(
   '/api/admin/newsletter/send',
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const apiKey = String(process.env.RESEND_API_KEY || '').trim();
-    if (!apiKey) {
+    const cfg = newsletterEmailConfig();
+    if (!cfg.apiKey) {
       return res.status(503).json({
         ok: false,
         error:
           'Newsletter email is not configured. Add RESEND_API_KEY to your environment (see Resend.com) and restart the server.',
       });
     }
-    const from = String(process.env.RESEND_FROM_EMAIL || '').trim();
-    if (!from) {
+    if (!cfg.from) {
       return res.status(503).json({
         ok: false,
         error:
           'Newsletter email is not configured. Set RESEND_FROM_EMAIL to a verified sender address (e.g. newsletters@yourdomain.com).',
       });
     }
-
-    const siteBase = newsletterPublicSiteBase();
-    if (!siteBase) {
+    if (!cfg.siteBase) {
       return res.status(400).json({
         ok: false,
         error:
           'SITE_URL must be set in the environment so each email can include a correct unsubscribe link (e.g. https://yourdomain.com).',
       });
+    }
+    if (newsletterJob.sending) {
+      return res.status(409).json({ ok: false, error: 'A newsletter is already being sent. Wait for it to finish.' });
     }
 
     const subject = stripText(req.body.subject, 998);
@@ -1522,42 +1788,27 @@ app.post(
       return res.status(400).json({ ok: false, error: 'Subject is required.' });
     }
     const htmlBody = String(req.body.html || '').slice(0, 500000);
-
-    const rows = await qr(
-      `SELECT email, token FROM subscribers WHERE status = 'active' ORDER BY id ASC`
-    );
-
-    const resend = new Resend(apiKey);
-    let sent = 0;
-    let failed = 0;
-
-    for (const row of rows) {
-      const html = buildNewsletterEmailHtml(htmlBody, siteBase, row.token);
-      try {
-        const { error } = await resend.emails.send({
-          from,
-          to: row.email,
-          subject,
-          html,
-        });
-        if (error) failed += 1;
-        else sent += 1;
-      } catch {
-        failed += 1;
-      }
+    if (!htmlBody.trim()) {
+      return res.status(400).json({ ok: false, error: 'Email body is required.' });
     }
 
-    logAdminFire(
-      req,
-      'newsletter_send',
-      'newsletter',
-      '',
-      `subject="${subject.slice(0, 160)}" recipients=${rows.length} sent=${sent} failed=${failed}`
-    );
+    const rows = await qr(`SELECT email, token FROM subscribers WHERE status = 'active' ORDER BY id ASC`);
+    if (!rows.length) {
+      return res.status(400).json({ ok: false, error: 'There are no active subscribers.' });
+    }
 
-    res.json({ ok: true, sent, failed });
+    newsletterJob = { sending: true, total: rows.length, sent: 0, failed: 0, last: newsletterJob.last };
+    // Sending runs in the background so large lists never hit HTTP/proxy timeouts.
+    runNewsletterJob(adminDisplayName(req), cfg, subject, htmlBody, rows).catch((e) => {
+      console.error('[newsletter] send job crashed:', e);
+    });
+    res.status(202).json({ ok: true, queued: rows.length });
   })
 );
+
+app.get('/api/admin/newsletter/send-status', requireAdmin, (_req, res) => {
+  res.json({ ok: true, ...newsletterJob });
+});
 
 app.get(
   '/api/admin/analytics',
@@ -1658,10 +1909,10 @@ app.post(
     if (!title) return res.status(400).json({ ok: false, error: 'Title required' });
     if (!slug) slug = slugify(title);
     const short_desc = stripText(req.body.short_desc, 800);
-    const long_desc = stripText(req.body.long_desc, 12000);
-    const image = String(req.body.image || '').slice(0, 500);
-    const link_url = String(req.body.link_url || '').trim().slice(0, 800);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const long_desc = stripMultiline(req.body.long_desc, 12000);
+    const image = sec.safeMediaUrl(req.body.image, 500);
+    const link_url = sec.safeLink(req.body.link_url, 800);
+    const sort_order = sortOrder(req.body.sort_order);
     const featured = req.body.featured ? 1 : 0;
     try {
       const ins = await query(
@@ -1696,10 +1947,10 @@ app.put(
     if (!title) return res.status(400).json({ ok: false, error: 'Title required' });
     if (!slug) slug = slugify(title);
     const short_desc = stripText(req.body.short_desc, 800);
-    const long_desc = stripText(req.body.long_desc, 12000);
-    const image = String(req.body.image || '').slice(0, 500);
-    const link_url = String(req.body.link_url || '').trim().slice(0, 800);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const long_desc = stripMultiline(req.body.long_desc, 12000);
+    const image = sec.safeMediaUrl(req.body.image, 500);
+    const link_url = sec.safeLink(req.body.link_url, 800);
+    const sort_order = sortOrder(req.body.sort_order);
     const featured = req.body.featured ? 1 : 0;
     try {
       await query(
@@ -1738,7 +1989,7 @@ app.post(
     let slug = String(req.body.slug || '').trim().slice(0, 120).toLowerCase();
     if (!name) return res.status(400).json({ ok: false, error: 'Name required' });
     if (!slug) slug = slugify(name);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const sort_order = sortOrder(req.body.sort_order);
     try {
       const ins = await query(
         `INSERT INTO blog_categories (name, slug, sort_order) VALUES (?, ?, ?) RETURNING *`,
@@ -1768,7 +2019,7 @@ app.put(
     let slug = String(req.body.slug || '').trim().slice(0, 120).toLowerCase();
     if (!name) return res.status(400).json({ ok: false, error: 'Name required' });
     if (!slug) slug = slugify(name);
-    const sort_order = Number(req.body.sort_order) || 0;
+    const sort_order = sortOrder(req.body.sort_order);
     try {
       await query(
         `UPDATE blog_categories SET name = ?, slug = ?, sort_order = ? WHERE id = ?`,
@@ -1803,8 +2054,8 @@ app.post(
   '/api/admin/blog/posts',
   requireAdmin,
   asyncHandler(async (req, res) => {
-    const category_id = Number(req.body.category_id) || 1;
-    if (!(await q1(`SELECT id FROM blog_categories WHERE id = ?`, [category_id]))) {
+    const category_id = sec.parsePositiveInt(req.body.category_id);
+    if (!category_id || !(await q1(`SELECT id FROM blog_categories WHERE id = ?`, [category_id]))) {
       return res.status(400).json({ ok: false, error: 'Invalid category' });
     }
     const title = stripText(req.body.title, 200);
@@ -1812,10 +2063,13 @@ app.post(
     if (!title) return res.status(400).json({ ok: false, error: 'Title required' });
     if (!slug) slug = slugify(title);
     const excerpt = stripText(req.body.excerpt, 600);
-    const bodyText = stripText(req.body.body, 60000);
+    const bodyText = stripMultiline(req.body.body, 60000);
     const published = req.body.published ? 1 : 0;
-    const published_at =
-      stripText(req.body.published_at, 40) || new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const parsedPublishedAt = sec.parseTimestamp(req.body.published_at);
+    if (parsedPublishedAt === undefined) {
+      return res.status(400).json({ ok: false, error: 'Invalid publish date' });
+    }
+    const published_at = parsedPublishedAt || new Date().toISOString().slice(0, 19).replace('T', ' ');
     const meta_title = stripText(req.body.meta_title, 200);
     const meta_description = stripText(req.body.meta_description, 400);
     const meta_keywords = stripText(req.body.meta_keywords, 400);
@@ -1857,15 +2111,21 @@ app.put(
     if (!(await q1(`SELECT id FROM blog_posts WHERE id = ?`, [id]))) {
       return res.status(404).json({ ok: false, error: 'Not found' });
     }
-    const category_id = Number(req.body.category_id) || 1;
+    const category_id = sec.parsePositiveInt(req.body.category_id);
+    if (!category_id || !(await q1(`SELECT id FROM blog_categories WHERE id = ?`, [category_id]))) {
+      return res.status(400).json({ ok: false, error: 'Invalid category' });
+    }
     const title = stripText(req.body.title, 200);
     let slug = String(req.body.slug || '').trim().slice(0, 120).toLowerCase();
     if (!title) return res.status(400).json({ ok: false, error: 'Title required' });
     if (!slug) slug = slugify(title);
     const excerpt = stripText(req.body.excerpt, 600);
-    const bodyText = stripText(req.body.body, 60000);
+    const bodyText = stripMultiline(req.body.body, 60000);
     const published = req.body.published ? 1 : 0;
-    const published_at = stripText(req.body.published_at, 40);
+    const published_at = sec.parseTimestamp(req.body.published_at);
+    if (published_at === undefined) {
+      return res.status(400).json({ ok: false, error: 'Invalid publish date' });
+    }
     const meta_title = stripText(req.body.meta_title, 200);
     const meta_description = stripText(req.body.meta_description, 400);
     const meta_keywords = stripText(req.body.meta_keywords, 400);
@@ -2085,11 +2345,14 @@ app.post(
   '/api/admin/upload',
   requireAdmin,
   (req, res) => {
-    upload.single('file')(req, res, (err) => {
+    upload.single('file')(req, res, async (err) => {
       if (err) {
         return res.status(400).json({ ok: false, error: err.message || 'Upload failed' });
       }
       if (!req.file) return res.status(400).json({ ok: false, error: 'No file' });
+      if (!(await verifyUploadedFile(req.file))) {
+        return res.status(400).json({ ok: false, error: 'The file content does not match its type.' });
+      }
       const url = `/uploads/${req.file.filename}`;
       logAdminFire(req, 'media_upload', 'media', req.file.filename, url);
       res.json({ ok: true, url });
@@ -2169,10 +2432,10 @@ app.delete(
   })
 );
 
-function sitePublicBaseUrl() {
+function sitePublicBaseUrl(req) {
   const raw = String(process.env.SITE_URL || '').trim();
   if (raw) return raw.replace(/\/+$/, '');
-  return `http://localhost:${PORT}`;
+  return req ? `${req.protocol}://${req.get('host')}` : `http://localhost:${PORT}`;
 }
 
 function sitemapDateISO(d) {
@@ -2193,8 +2456,8 @@ function xmlEscape(s) {
 
 app.get(
   '/sitemap.xml',
-  asyncHandler(async (_req, res) => {
-    const base = sitePublicBaseUrl();
+  asyncHandler(async (req, res) => {
+    const base = sitePublicBaseUrl(req);
     const staticPaths = [
       '/',
       '/about.html',
@@ -2255,21 +2518,89 @@ app.get(
   })
 );
 
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(
+    `User-agent: *\nAllow: /\n\nDisallow: /admin/\nDisallow: /api/\nDisallow: /uploads/\n\nSitemap: ${sitePublicBaseUrl(req)}/sitemap.xml\n`
+  );
+});
 
+// Chart.js is served from our own origin (no third-party CDN script on the admin page).
+app.get('/vendor/chart.umd.js', (_req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'node_modules', 'chart.js', 'dist', 'chart.umd.js'));
+});
+
+// Uploaded files are untrusted: never sniffed, never executed. Anything that is not a plain image downloads.
+app.use(
+  '/uploads',
+  (req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+    if (!/\.(jpe?g|png|webp|gif|svg)$/i.test(req.path)) {
+      res.setHeader('Content-Disposition', 'attachment');
+    }
+    next();
+  },
+  express.static(uploadsDir, { index: false, dotfiles: 'deny', fallthrough: false })
+);
+
+app.use(express.static(path.join(__dirname, '..', 'public'), { dotfiles: 'ignore' }));
+
+app.use('/api', (_req, res) => {
+  res.status(404).json({ ok: false, error: 'Not found' });
+});
+
+app.use((_req, res) => {
+  res.status(404).type('text/plain').send('Not found');
+});
+
+// eslint-disable-next-line no-unused-vars
 app.use((err, _req, res, _next) => {
+  if (res.headersSent) return;
+  if (err && err.type === 'entity.parse.failed') {
+    return res.status(400).json({ ok: false, error: 'Invalid request body' });
+  }
+  if (err && err.type === 'entity.too.large') {
+    return res.status(413).json({ ok: false, error: 'Request too large' });
+  }
+  if (err && (err.status === 404 || err.statusCode === 404)) {
+    return res.status(404).type('text/plain').send('Not found');
+  }
   console.error(err);
   res.status(500).json({ ok: false, error: 'Server error' });
 });
 
+function logProductionWarnings() {
+  if (!isProd) return;
+  if (!process.env.SITE_URL) console.warn('[config] SITE_URL is not set: sitemap and newsletter links are derived from the request host.');
+  if (!process.env.TRUST_PROXY) {
+    console.warn('[config] TRUST_PROXY is not set: assuming the app is exposed directly (no reverse proxy). Set TRUST_PROXY=1 behind nginx/Caddy/a load balancer.');
+  }
+  if (!newsletterEmailConfig().ready) {
+    console.warn('[config] Newsletter email is not fully configured (RESEND_API_KEY, RESEND_FROM_EMAIL, SITE_URL): signup is disabled.');
+  }
+  if (!cookieSecure) console.warn('[config] COOKIE_SECURE=false: admin session cookies are sent over plain HTTP.');
+}
+
 initDb()
   .then(() => {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT, () => {
       console.log(`Server running at http://localhost:${PORT}`);
       if (!isProd) {
         console.log('Dev defaults: set ADMIN_PASSWORD and DB_* via env for production.');
       }
+      logProductionWarnings();
     });
+
+    let closing = false;
+    const shutdown = (signal) => {
+      if (closing) return;
+      closing = true;
+      console.log(`${signal} received, shutting down.`);
+      server.close(() => pool.end().finally(() => process.exit(0)));
+      setTimeout(() => process.exit(1), 10000).unref();
+    };
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+    process.on('SIGINT', () => shutdown('SIGINT'));
   })
   .catch((err) => {
     console.error('Database init failed:', err);

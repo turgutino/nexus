@@ -1787,6 +1787,31 @@
       });
     }
 
+    const btnPwChange = $("#btn-password-change");
+    if (btnPwChange) {
+      btnPwChange.addEventListener("click", async () => {
+        const err = $("#pw-change-err");
+        if (err) err.textContent = "";
+        const cur = $("#pw-current");
+        const n1 = $("#pw-new");
+        const n2 = $("#pw-new2");
+        try {
+          if (!n1.value || n1.value !== n2.value) throw new Error("The new passwords do not match.");
+          await apiJson("/api/admin/password", {
+            method: "POST",
+            body: JSON.stringify({ currentPassword: cur.value, newPassword: n1.value }),
+          });
+          cur.value = "";
+          n1.value = "";
+          n2.value = "";
+          setStatus("Password changed. Other sessions were signed out.", "ok");
+        } catch (e) {
+          if (err) err.textContent = e.message;
+          setStatus(e.message, "err");
+        }
+      });
+    }
+
     const nflt = $("#newsletter-filter");
     if (nflt) {
       nflt.addEventListener("change", () => {
@@ -1890,11 +1915,26 @@
           });
           const j = await r.json().catch(() => ({}));
           if (!r.ok) throw new Error(j.error || r.statusText || "Send failed");
+          // The server sends in the background; poll until it reports the final counts.
+          const queuedMsg = "Sending to " + j.queued + " subscriber(s)…";
           if (st) {
-            st.textContent = "Sent: " + j.sent + ", failed: " + j.failed + ".";
-            st.className = "status " + (j.failed ? "err" : "ok");
+            st.textContent = queuedMsg;
+            st.className = "status";
           }
-          setStatus("Newsletter: " + j.sent + " sent, " + j.failed + " failed.", j.failed ? "err" : "ok");
+          setStatus(queuedMsg, "");
+          let final = null;
+          for (let i = 0; i < 900 && !final; i += 1) {
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            const sj = await apiJson("/api/admin/newsletter/send-status");
+            if (!sj.sending) final = sj.last || { sent: 0, failed: j.queued };
+          }
+          if (!final) throw new Error("Still sending. Check the Activity log for the final result.");
+          const doneMsg = "Newsletter: " + final.sent + " sent, " + final.failed + " failed.";
+          if (st) {
+            st.textContent = doneMsg;
+            st.className = "status " + (final.failed ? "err" : "ok");
+          }
+          setStatus(doneMsg, final.failed ? "err" : "ok");
           renderNewsletterSubscribers();
         } catch (e) {
           if (st) {

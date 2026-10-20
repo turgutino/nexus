@@ -1,0 +1,12 @@
+# Caddy obtains and renews the HTTPS certificate automatically (Let's Encrypt).
+{$SITE_DOMAIN} {
+	encode zstd gzip
+
+	# Behind Caddy the app sees the real client IP via X-Forwarded-For (TRUST_PROXY=1).
+	reverse_proxy app:3000
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+}

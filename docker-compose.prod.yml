@@ -1,0 +1,33 @@
+# Production overlay: adds Caddy (automatic HTTPS) in front of the app.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Requires SITE_DOMAIN in .env (e.g. SITE_DOMAIN=myteam.duckdns.org) pointing at this server's public IP,
+# and ports 80/443 open in the cloud firewall.
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SITE_DOMAIN: ${SITE_DOMAIN:?Set SITE_DOMAIN in .env (your domain, without https://)}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+  app:
+    environment:
+      # Caddy is exactly one reverse proxy in front of the app.
+      TRUST_PROXY: "1"
+      SITE_URL: https://${SITE_DOMAIN}
+
+volumes:
+  caddy_data:
+  caddy_config:

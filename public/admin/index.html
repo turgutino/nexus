@@ -47,7 +47,6 @@
           </form>
           <p id="login-totp-err" class="err"></p>
         </div>
-        <p class="hint muted">Demo: admin / admin123 — set ADMIN_PASSWORD and SESSION_SECRET for production.</p>
         <p><a href="/index.html" class="muted">← Back to site</a></p>
       </div>
     </div>
@@ -231,6 +230,7 @@
               <select id="newsletter-filter">
                 <option value="">All</option>
                 <option value="active">Active</option>
+                <option value="pending">Pending confirmation</option>
                 <option value="unsubscribed">Unsubscribed</option>
               </select>
             </label>
@@ -290,6 +290,17 @@
               <p id="twofa-disable-err" class="err"></p>
             </div>
           </div>
+          <div class="card" style="margin-top: 1rem; max-width: 32rem">
+            <h3 style="margin-top: 0">Change password</h3>
+            <p class="muted">Use at least 12 characters. All other signed-in sessions are signed out when you change it.</p>
+            <div class="grid-form">
+              <label>Current password <input type="password" id="pw-current" autocomplete="current-password" /></label>
+              <label>New password <input type="password" id="pw-new" autocomplete="new-password" minlength="12" /></label>
+              <label>Repeat new password <input type="password" id="pw-new2" autocomplete="new-password" minlength="12" /></label>
+            </div>
+            <button type="button" class="btn primary" id="btn-password-change">Change password</button>
+            <p id="pw-change-err" class="err"></p>
+          </div>
         </section>
 
         <section id="tab-activity" class="tab-panel hidden">
@@ -334,7 +345,7 @@
       </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+    <script src="/vendor/chart.umd.js"></script>
     <script src="/admin/admin.js"></script>
   </body>
 </html>

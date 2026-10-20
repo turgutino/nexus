@@ -6,6 +6,10 @@
   "scripts": {
     "start": "node server/server.js",
     "dev": "node server/server.js",
+    "test": "node scripts/run-tests.js",
+    "check": "node scripts/check-syntax.js",
+    "admin:reset-password": "node server/scripts/reset-admin.js",
+    "admin:disable-2fa": "node server/scripts/reset-admin.js --disable-2fa",
     "import:sqlite": "node server/scripts/sqlite-to-postgres.js"
   },
   "engines": {
@@ -13,6 +17,7 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "chart.js": "^4.4.6",
     "connect-redis": "^6.1.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",

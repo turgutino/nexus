@@ -4,6 +4,7 @@ const { getPoolOptions } = require('./pg-config');
 const { Pool } = require('pg');
 const bcrypt = require('bcryptjs');
 const { getAllSeedRows, getSeedStringsForLocale } = require('./i18n-seeds');
+const { passwordProblem, WEAK_PASSWORDS } = require('./lib/security');
 
 const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
 
@@ -103,6 +104,17 @@ async function setKv(key, value) {
   );
 }
 
+/** Atomic counter increment (no read-modify-write race). Returns the new value. */
+async function incrementKv(key) {
+  const row = await q1(
+    `INSERT INTO site_kv (key, value) VALUES (?, '1')
+     ON CONFLICT (key) DO UPDATE SET value = (COALESCE(NULLIF(site_kv.value, '')::bigint, 0) + 1)::text
+     RETURNING value`,
+    [key]
+  );
+  return Number(row.value);
+}
+
 function slugify(text) {
   return String(text)
     .toLowerCase()
@@ -156,13 +168,31 @@ async function seedIfEmpty() {
   const defaultUser = process.env.ADMIN_USERNAME || 'admin';
   const defaultPass = process.env.ADMIN_PASSWORD || 'admin123';
 
-  const adminExists = await q1(`SELECT 1 AS x FROM admin_user WHERE id = 1`);
+  const isProd = process.env.NODE_ENV === 'production';
+  const adminRow = await q1(`SELECT password_hash FROM admin_user WHERE id = 1`);
+  const adminExists = !!adminRow;
   if (!adminExists) {
+    if (isProd) {
+      const problem = process.env.ADMIN_PASSWORD ? passwordProblem(process.env.ADMIN_PASSWORD) : 'ADMIN_PASSWORD is not set.';
+      if (problem) {
+        throw new Error(
+          `Refusing to create the admin account in production: ${problem} Set a strong ADMIN_PASSWORD (12+ characters).`
+        );
+      }
+    }
     const hash = bcrypt.hashSync(defaultPass, 12);
     await query(`INSERT INTO admin_user (id, username, password_hash) VALUES (1, ?, ?)`, [
       defaultUser,
       hash,
     ]);
+  } else if (isProd) {
+    const weak = [...WEAK_PASSWORDS].find((pw) => bcrypt.compareSync(pw, adminRow.password_hash));
+    if (weak) {
+      throw new Error(
+        'Refusing to start in production: the admin account still uses a default/weak password. ' +
+          'Run "npm run admin:reset-password" and restart.'
+      );
+    }
   }
 
   if ((await kvCount()) === 0) {
@@ -492,6 +522,7 @@ module.exports = {
   q1,
   getKvMap,
   setKv,
+  incrementKv,
   slugify,
   uploadsDir,
   translationMapForLocale,

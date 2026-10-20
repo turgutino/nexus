@@ -42,8 +42,12 @@ services:
       DB_HOST: postgres
       DB_PORT: ${DB_PORT:-5432}
       REDIS_URL: redis://redis:6379
+    # Bound to localhost by default: put a TLS-terminating reverse proxy (Caddy/nginx) in front and set
+    # TRUST_PROXY=1 in .env. Set BIND_ADDR=0.0.0.0 only if you intentionally expose the app port.
     ports:
-      - "${PORT:-3000}:${PORT:-3000}"
+      - "${BIND_ADDR:-127.0.0.1}:${PORT:-3000}:${PORT:-3000}"
+    volumes:
+      - uploads:/app/public/uploads
     depends_on:
       postgres:
         condition: service_healthy
@@ -54,3 +58,4 @@ services:
 volumes:
   pgdata:
   redisdata:
+  uploads:

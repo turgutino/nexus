@@ -28,7 +28,7 @@
             status.className = "form-status footer-newsletter-status err";
             return;
           }
-          status.textContent = "Thanks — you are subscribed.";
+          status.textContent = "Almost done — check your inbox and click the confirmation link.";
           status.className = "form-status footer-newsletter-status ok";
           form.reset();
         })
