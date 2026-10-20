@@ -128,40 +128,127 @@
     if (foot) foot.textContent = site.footerTagline;
   }
 
+  // Flag file per locale (English is shown with the American flag).
+  const FLAG_FILES = { en: "us", tr: "tr", az: "az", ru: "ru", fr: "fr", es: "es", de: "de" };
+
+  function flagImg(code) {
+    const img = document.createElement("img");
+    img.className = "lang-flag";
+    img.src = "/img/flags/" + (FLAG_FILES[code] || "us") + ".svg";
+    img.alt = "";
+    img.width = 28;
+    img.height = 28;
+    img.draggable = false;
+    return img;
+  }
+
+  function langName(code) {
+    const hit = LANG_OPTIONS.find((o) => o.code === code);
+    return hit ? hit.name : code;
+  }
+
   function syncLangSelect() {
     const wrap = document.getElementById("lang-switch");
-    const sel = wrap && wrap.querySelector("select.lang-select");
-    if (!sel || !window.SiteI18n) return;
+    if (!wrap || !window.SiteI18n) return;
     const loc = window.SiteI18n.getLocale();
-    if ([...sel.options].some((o) => o.value === loc)) sel.value = loc;
+    const btn = wrap.querySelector(".lang-btn");
+    if (btn) {
+      const label = window.SiteI18n.t("nav.lang", "Language") + ": " + langName(loc);
+      btn.setAttribute("aria-label", label);
+      btn.setAttribute("title", langName(loc));
+      const img = btn.querySelector("img");
+      if (img) img.src = "/img/flags/" + (FLAG_FILES[loc] || "us") + ".svg";
+    }
+    wrap.querySelectorAll(".lang-option").forEach((o) => {
+      const on = o.getAttribute("data-code") === loc;
+      o.setAttribute("aria-selected", on ? "true" : "false");
+      o.classList.toggle("active", on);
+    });
   }
 
   let headerChromeBound = false;
 
+  // Language picker: a round flag button that opens a small menu of round flags (no text).
   function injectLangSwitch(container) {
     if (!container || document.getElementById("lang-switch") || !window.SiteI18n) return;
     const wrap = document.createElement("span");
     wrap.id = "lang-switch";
     wrap.className = "lang-switch";
-    const sel = document.createElement("select");
-    sel.className = "lang-select";
-    sel.setAttribute("aria-label", window.SiteI18n.t("nav.lang", "Language"));
-    LANG_OPTIONS.forEach(({ code, label, name }) => {
-      const opt = document.createElement("option");
-      opt.value = code;
-      opt.textContent = label + " — " + name;
-      sel.appendChild(opt);
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "lang-btn";
+    btn.setAttribute("aria-haspopup", "listbox");
+    btn.setAttribute("aria-expanded", "false");
+    btn.appendChild(flagImg(getLocale() || "en"));
+
+    const menu = document.createElement("div");
+    menu.className = "lang-menu";
+    menu.setAttribute("role", "listbox");
+    menu.hidden = true;
+
+    LANG_OPTIONS.forEach(({ code, name }) => {
+      const opt = document.createElement("button");
+      opt.type = "button";
+      opt.className = "lang-option";
+      opt.setAttribute("role", "option");
+      opt.setAttribute("data-code", code);
+      opt.setAttribute("aria-label", name);
+      opt.setAttribute("title", name);
+      opt.appendChild(flagImg(code));
+      menu.appendChild(opt);
     });
-    sel.value = getLocale() || "en";
-    sel.addEventListener("change", async () => {
-      await window.SiteI18n.setLocaleAndReloadStrings(sel.value);
-      sel.setAttribute("aria-label", window.SiteI18n.t("nav.lang", "Language"));
+
+    function setOpen(open) {
+      menu.hidden = !open;
+      btn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    btn.addEventListener("click", () => {
+      const open = menu.hidden;
+      setOpen(open);
+      if (open) {
+        const cur = menu.querySelector(".lang-option.active") || menu.querySelector(".lang-option");
+        if (cur) cur.focus();
+      }
+    });
+
+    menu.addEventListener("click", async (e) => {
+      const opt = e.target.closest(".lang-option");
+      if (!opt) return;
+      const code = opt.getAttribute("data-code");
+      setOpen(false);
+      btn.focus();
+      await window.SiteI18n.setLocaleAndReloadStrings(code);
+      syncLangSelect();
       const site = await fetchSiteMini();
       applyBindFromSite(site);
       if (window.SiteI18n) window.SiteI18n.applyDom(document);
     });
-    wrap.appendChild(sel);
+
+    wrap.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !menu.hidden) {
+        setOpen(false);
+        btn.focus();
+        return;
+      }
+      if ((e.key === "ArrowDown" || e.key === "ArrowUp") && !menu.hidden) {
+        const items = [...menu.querySelectorAll(".lang-option")];
+        const i = items.indexOf(document.activeElement);
+        const next = e.key === "ArrowDown" ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+        items[next].focus();
+        e.preventDefault();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!wrap.contains(e.target)) setOpen(false);
+    });
+
+    wrap.appendChild(btn);
+    wrap.appendChild(menu);
     container.insertBefore(wrap, container.firstChild);
+    syncLangSelect();
   }
 
   let localeHookInstalled = false;

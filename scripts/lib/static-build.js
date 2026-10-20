@@ -15,13 +15,13 @@ function normalizeBase(raw) {
 }
 
 /**
- * Prefixes absolute site paths ("/css/…", "/js/…", "/data/…", "/uploads/…", "/about.html") that appear
+ * Prefixes absolute site paths ("/css/…", "/js/…", "/img/…", "/data/…", "/uploads/…", "/about.html") that appear
  * inside quotes or url(…) with the hosting base path. "/api/…" is intentionally left alone: the browser shim
  * intercepts those calls.
  */
 function rewriteAssetPaths(text, base) {
   if (!base) return text;
-  const re = new RegExp('(["\'`(])/(?=(?:css|js|data|uploads)/|(?:' + PAGES.join('|') + ')\.html)', 'g');
+  const re = new RegExp('(["\'`(])/(?=(?:css|js|img|data|uploads)/|(?:' + PAGES.join('|') + ')\.html)', 'g');
   return text.replace(re, `$1${base}/`);
 }
 

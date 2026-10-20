@@ -13,13 +13,14 @@ test('normalizeBase', () => {
 
 test('rewriteAssetPaths prefixes site paths but not api, external or protocol-relative URLs', () => {
   const b = '/Company-site';
-  const src = `<link href="/css/styles.css"><a href="/contact.html">x</a><script src="/js/a.js"></script>
+  const src = `<link href="/css/styles.css"><a href="/contact.html">x</a><script src="/js/a.js"></script><img src="/img/flags/us.svg">
     fetch("/api/public/site"); "//cdn.example/x.js"; "https://x.example/css/a.css"; url(/uploads/a.png) \`/blog.html?\${p}\``;
   const out = lib.rewriteAssetPaths(src, b);
   assert.ok(out.includes('href="/Company-site/css/styles.css"'));
   assert.ok(out.includes('href="/Company-site/contact.html"'));
   assert.ok(out.includes('src="/Company-site/js/a.js"'));
   assert.ok(out.includes('url(/Company-site/uploads/a.png)'));
+  assert.ok(out.includes('src="/Company-site/img/flags/us.svg"'));
   assert.ok(out.includes('`/Company-site/blog.html?'));
   assert.ok(out.includes('fetch("/api/public/site")'));
   assert.ok(out.includes('"//cdn.example/x.js"'));
