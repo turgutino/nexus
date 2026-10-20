@@ -23,7 +23,8 @@
     }
   }
 
-  function setLocale(code) {
+  // Stores the locale and updates <html lang> without announcing the change.
+  function persistLocale(code) {
     const loc = normalizeLocale(code) || 'en';
     try {
       if (loc === 'en') localStorage.removeItem(STORAGE_KEY);
@@ -32,7 +33,16 @@
       /* private mode */
     }
     document.documentElement.setAttribute('lang', loc);
+    return loc;
+  }
+
+  function announceLocale(loc) {
     window.dispatchEvent(new CustomEvent(LOCALE_EVENT, { detail: { locale: loc } }));
+  }
+
+  function setLocale(code) {
+    const loc = persistLocale(code);
+    announceLocale(loc);
     return loc;
   }
 
@@ -112,10 +122,13 @@
     return readyPromise;
   }
 
+  // The change is announced only AFTER the new strings are loaded. Listeners (home, blog, seo ...) re-render
+  // on this event, so announcing earlier made them render with the previous language's strings.
   async function setLocaleAndReloadStrings(code) {
-    const loc = setLocale(code);
+    const loc = persistLocale(code);
     await loadStrings(loc);
     applyDom(document);
+    announceLocale(loc);
     return loc;
   }
 
