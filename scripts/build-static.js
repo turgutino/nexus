@@ -10,6 +10,7 @@
  *         static/static-shim.js, static/config.json, static/uploads/.
  */
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const lib = require('./lib/static-build');
 
@@ -37,7 +38,7 @@ function copyDir(src, dst, rel = '') {
       continue;
     }
     if (e.name.endsWith('.html')) {
-      fs.writeFileSync(d, lib.transformHtml(fs.readFileSync(s, 'utf8'), base, config));
+      fs.writeFileSync(d, lib.transformHtml(fs.readFileSync(s, 'utf8'), base, config, version));
     } else if (e.name.endsWith('.js')) {
       fs.writeFileSync(d, lib.rewriteAssetPaths(lib.rewritePathnameUsage(fs.readFileSync(s, 'utf8')), base));
     } else if (e.name.endsWith('.css')) {
@@ -46,6 +47,22 @@ function copyDir(src, dst, rel = '') {
       fs.copyFileSync(s, d);
     }
   }
+}
+
+// Version = hash of everything that ends up in the site, so URLs change exactly when content changes.
+function contentVersion() {
+  const h = crypto.createHash('sha1');
+  (function walk(dir) {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true }).sort((a, b) => a.name.localeCompare(b.name))) {
+      if (['admin', 'uploads', 'node_modules'].includes(e.name)) continue;
+      const p = path.join(dir, e.name);
+      if (e.isDirectory()) walk(p);
+      else h.update(e.name).update(fs.readFileSync(p));
+    }
+  })(path.join(root, 'public'));
+  for (const f of ['static-shim.js', 'site-data.json', 'config.json']) h.update(fs.readFileSync(path.join(root, 'static', f)));
+  h.update(fs.readFileSync(path.join(__dirname, 'lib', 'static-build.js')));
+  return h.digest('hex').slice(0, 10);
 }
 
 const dataPath = path.join(root, 'static', 'site-data.json');
@@ -62,6 +79,7 @@ const config = {
 };
 const siteUrl = String(argVal('--site-url', cfg.siteUrl || '')).replace(/\/+$/, '');
 
+const version = contentVersion();
 fs.rmSync(out, { recursive: true, force: true });
 copyDir(path.join(root, 'public'), out);
 
@@ -99,4 +117,4 @@ fs.writeFileSync(
     `<body style="font-family:system-ui,sans-serif;max-width:32rem;margin:4rem auto;padding:0 1rem"><h1>Page not found</h1><p><a href="${base}/">Back to the home page</a></p></body></html>\n`
 );
 
-console.log(`Static site built in ${path.relative(root, out)}/ (base path: "${base || '/'}")`);
+console.log(`Static site built in ${path.relative(root, out)}/ (base path: "${base || '/'}", version ${version})`);

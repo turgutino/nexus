@@ -16,7 +16,7 @@
 
   function loadData() {
     if (!dataPromise) {
-      dataPromise = origFetch(BASE + "/data/site-data.json").then(function (r) {
+      dataPromise = origFetch(BASE + "/data/site-data.json" + (window.__STATIC_VERSION__ ? "?v=" + window.__STATIC_VERSION__ : "")).then(function (r) {
         if (!r.ok) throw new Error("site-data.json not found");
         return r.json();
       });

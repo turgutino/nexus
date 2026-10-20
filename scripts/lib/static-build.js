@@ -57,7 +57,7 @@ function escapeForInlineScript(json) {
 }
 
 /** Injects the browser shim before the first script tag and the static-mode CSS before </head>. */
-function transformHtml(html, base, config) {
+function transformHtml(html, base, config, version) {
   const cfg = escapeForInlineScript(JSON.stringify(config || {}));
   const shim =
     `<script>window.__STATIC_BASE__=${JSON.stringify(base)};window.__STATIC_CONFIG__=${cfg};</script>\n` +
@@ -72,7 +72,16 @@ function transformHtml(html, base, config) {
   // The static site has no admin panel: drop the footer link and give that column a translated "Contact" heading.
   out = out.replace(/\s*<li><a href="\/admin\/"[^>]*>[^<]*<\/a><\/li>/g, '');
   out = out.replace('<h4 data-i18n="footer.admin">Admin</h4>', '<h4 data-i18n="nav.contact">Contact</h4>');
-  return rewriteAssetPaths(out, base);
+  return addVersion(rewriteAssetPaths(out, base), version);
+}
+
+/**
+ * Appends ?v=<version> to local script/stylesheet/icon URLs so a new deployment is never mixed with
+ * files cached from the previous one (GitHub Pages lets browsers cache every file for 10 minutes).
+ */
+function addVersion(html, version) {
+  if (!version) return html;
+  return html.replace(/(<(?:script|link)\b[^>]*?\b(?:src|href)=")(\/[^"?#]+\.(?:js|css|svg))(")/g, `$1$2?v=${version}$3`);
 }
 
 function buildSitemap(siteUrl, slugs) {
@@ -91,6 +100,7 @@ module.exports = {
   normalizeBase,
   rewriteAssetPaths,
   rewritePathnameUsage,
+  addVersion,
   prefixDeep,
   transformHtml,
   buildSitemap,

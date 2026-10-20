@@ -78,3 +78,15 @@ test('lines tagged static:keep are not rewritten', () => {
   assert.equal(out[0], kept);
   assert.equal(out[1], 'b = "/nexus/about.html";');
 });
+
+test('addVersion tags local scripts, styles and icons but not external or api URLs', () => {
+  const html = '<link rel="stylesheet" href="/nexus/css/styles.css"><link href="https://fonts.googleapis.com/css2?x=1" rel="stylesheet">' +
+    '<link rel="icon" href="/nexus/img/logo.svg"><script src="/nexus/js/app.js"></script><a href="/nexus/blog.html">b</a>';
+  const out = lib.addVersion(html, 'abc123');
+  assert.ok(out.includes('href="/nexus/css/styles.css?v=abc123"'));
+  assert.ok(out.includes('href="/nexus/img/logo.svg?v=abc123"'));
+  assert.ok(out.includes('src="/nexus/js/app.js?v=abc123"'));
+  assert.ok(out.includes('href="https://fonts.googleapis.com/css2?x=1"'));
+  assert.ok(out.includes('href="/nexus/blog.html"'));
+  assert.equal(lib.addVersion(html, ''), html);
+});
