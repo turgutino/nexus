@@ -3,7 +3,7 @@
  * Keys overlap site_kv fields (company_name, hero_*, etc.) for server applyTranslations.
  */
 
-const I18N_LOCALES = ['en', 'tr', 'az', 'ru', 'fr', 'es', 'de'];
+const I18N_LOCALES = ['en', 'tr', 'az', 'ru', 'fr', 'es', 'de', 'he'];
 
 const LOCALE_LABELS = {
   en: 'English',
@@ -13,6 +13,7 @@ const LOCALE_LABELS = {
   fr: 'Français',
   es: 'Español',
   de: 'Deutsch',
+  he: 'עברית',
 };
 
 /** Each key -> per-locale string (full coverage for defaults) */
@@ -25,6 +26,7 @@ const MATRIX = {
     fr: 'Nexus Studio',
     es: 'Nexus Studio',
     de: 'Nexus Studio',
+    he: 'Nexus Studio',
   },
   hero_title: {
     en: 'Build bold digital experiences',
@@ -34,6 +36,7 @@ const MATRIX = {
     fr: 'Créez des expériences numériques audacieuses',
     es: 'Construye experiencias digitales audaces',
     de: 'Schaffen Sie kühne digitale Erlebnisse',
+    he: 'בנו חוויות דיגיטליות נועזות',
   },
   hero_subtitle: {
     en: 'Strategy, design, and engineering that help growing companies ship products customers love—on time and on brand.',
@@ -43,6 +46,7 @@ const MATRIX = {
     fr: 'Stratégie, design et ingénierie pour aider les entreprises en croissance à livrer des produits appréciés des clients — à temps et dans l’esprit de la marque.',
     es: 'Estrategia, diseño e ingeniería para que las empresas en crecimiento lancen productos que encantan a los clientes, a tiempo y con coherencia de marca.',
     de: 'Strategie, Design und Engineering, damit wachsende Unternehmen Produkte liefern, die Kundinnen und Kunden lieben — termingerecht und markenkonform.',
+    he: 'אסטרטגיה, עיצוב והנדסה שעוזרים לחברות צומחות להשיק מוצרים שהלקוחות אוהבים — בזמן ובהתאם למותג.',
   },
   hero_cta_primary_text: {
     en: 'View services',
@@ -52,6 +56,7 @@ const MATRIX = {
     fr: 'Voir les services',
     es: 'Ver servicios',
     de: 'Leistungen ansehen',
+    he: 'צפו בשירותים',
   },
   hero_cta_secondary_text: {
     en: 'Contact us',
@@ -61,6 +66,7 @@ const MATRIX = {
     fr: 'Contact',
     es: 'Contáctanos',
     de: 'Kontakt',
+    he: 'צרו קשר',
   },
   footer_tagline: {
     en: '© Nexus Studio. Crafted with care for ambitious teams.',
@@ -70,6 +76,7 @@ const MATRIX = {
     fr: '© Nexus Studio. Conçu avec soin pour les équipes ambitieuses.',
     es: '© Nexus Studio. Hecho con mimo para equipos ambiciosos.',
     de: '© Nexus Studio. Mit Sorgfalt für ambitionierte Teams.',
+    he: '© Nexus Studio. נוצר בקפידה עבור צוותים שאפתניים.',
   },
   home_about_title: {
     en: 'About our studio',
@@ -79,6 +86,7 @@ const MATRIX = {
     fr: 'À propos du studio',
     es: 'Sobre nuestro estudio',
     de: 'Über unser Studio',
+    he: 'על הסטודיו שלנו',
   },
   home_about_text: {
     en: 'We are a multidisciplinary team focused on clarity, performance, and outcomes. From discovery to launch, we partner closely with you.',
@@ -88,6 +96,7 @@ const MATRIX = {
     fr: 'Équipe pluridisciplinaire axée sur la clarté, la performance et les résultats. De la découverte au lancement, nous sommes à vos côtés.',
     es: 'Equipo multidisciplinar centrado en claridad, rendimiento y resultados. Del descubrimiento al lanzamiento, contigo.',
     de: 'Ein multidisziplinäres Team mit Fokus auf Klarheit, Performance und Ergebnisse. Von Discovery bis Launch an Ihrer Seite.',
+    he: 'אנחנו צוות רב־תחומי שמתמקד בבהירות, בביצועים ובתוצאות. מהאפיון ועד ההשקה, אנחנו לצדכם.',
   },
   home_projects_title: {
     en: 'Projects & micro-SaaS',
@@ -97,6 +106,7 @@ const MATRIX = {
     fr: 'Projets & micro-SaaS',
     es: 'Proyectos y micro-SaaS',
     de: 'Projekte & Micro-SaaS',
+    he: 'פרויקטים ו-micro-SaaS',
   },
   home_projects_intro: {
     en: 'Shipping products for clients—and a few of our own small bets—in production today.',
@@ -106,6 +116,7 @@ const MATRIX = {
     fr: 'Des livraisons pour nos clients — et quelques petits paris internes — déjà en production.',
     es: 'Lanzando productos para clientes — y algunas apuestas propias — ya en producción.',
     de: 'Produkte für Kunden — und ein paar eigene kleine Wetten — heute live.',
+    he: 'משיקים מוצרים ללקוחות — וגם כמה יוזמות קטנות משלנו — שכבר פועלים בייצור.',
   },
   'nav.home': {
     en: 'Home',
@@ -115,6 +126,7 @@ const MATRIX = {
     fr: 'Accueil',
     es: 'Inicio',
     de: 'Start',
+    he: 'בית',
   },
   'nav.about': {
     en: 'About',
@@ -124,6 +136,7 @@ const MATRIX = {
     fr: 'À propos',
     es: 'Nosotros',
     de: 'Über uns',
+    he: 'אודות',
   },
   'nav.services': {
     en: 'Services',
@@ -133,6 +146,7 @@ const MATRIX = {
     fr: 'Services',
     es: 'Servicios',
     de: 'Leistungen',
+    he: 'שירותים',
   },
   'nav.work': {
     en: 'Work',
@@ -142,6 +156,7 @@ const MATRIX = {
     fr: 'Réalisations',
     es: 'Trabajo',
     de: 'Referenzen',
+    he: 'עבודות',
   },
   'nav.blog': {
     en: 'Blog',
@@ -151,6 +166,7 @@ const MATRIX = {
     fr: 'Blog',
     es: 'Blog',
     de: 'Blog',
+    he: 'בלוג',
   },
   'nav.team': {
     en: 'Team',
@@ -160,6 +176,7 @@ const MATRIX = {
     fr: 'Équipe',
     es: 'Equipo',
     de: 'Team',
+    he: 'צוות',
   },
   'nav.contact': {
     en: 'Contact',
@@ -169,6 +186,7 @@ const MATRIX = {
     fr: 'Contact',
     es: 'Contacto',
     de: 'Kontakt',
+    he: 'צור קשר',
   },
   'nav.cta_project': {
     en: 'Start a project',
@@ -178,6 +196,7 @@ const MATRIX = {
     fr: 'Lancer un projet',
     es: 'Iniciar un proyecto',
     de: 'Projekt starten',
+    he: 'התחילו פרויקט',
   },
   'nav.lang': {
     en: 'Language',
@@ -187,6 +206,7 @@ const MATRIX = {
     fr: 'Langue',
     es: 'Idioma',
     de: 'Sprache',
+    he: 'שפה',
   },
   'nav.menu_aria': {
     en: 'Open menu',
@@ -196,6 +216,7 @@ const MATRIX = {
     fr: 'Ouvrir le menu',
     es: 'Abrir menú',
     de: 'Menü öffnen',
+    he: 'פתח תפריט',
   },
   'footer.tagline_extra': {
     en: 'Strategy, design, and engineering for teams that care about quality.',
@@ -205,6 +226,7 @@ const MATRIX = {
     fr: 'Stratégie, design et ingénierie pour les équipes soucieuses de la qualité.',
     es: 'Estrategia, diseño e ingeniería para equipos que priorizan la calidad.',
     de: 'Strategie, Design und Engineering für Teams, denen Qualität wichtig ist.',
+    he: 'אסטרטגיה, עיצוב והנדסה לצוותים שאכפת להם מאיכות.',
   },
   'footer.explore': {
     en: 'Explore',
@@ -214,6 +236,7 @@ const MATRIX = {
     fr: 'Explorer',
     es: 'Explorar',
     de: 'Entdecken',
+    he: 'גלו',
   },
   'footer.admin': {
     en: 'Admin',
@@ -223,6 +246,7 @@ const MATRIX = {
     fr: 'Admin',
     es: 'Admin',
     de: 'Admin',
+    he: 'ניהול',
   },
   'footer.content_admin': {
     en: 'Content admin',
@@ -232,6 +256,7 @@ const MATRIX = {
     fr: 'Admin contenu',
     es: 'Admin de contenido',
     de: 'Content-Admin',
+    he: 'ניהול תוכן',
   },
   'footer.performance': {
     en: 'Performance-first · Secure defaults',
@@ -241,6 +266,7 @@ const MATRIX = {
     fr: 'Performance d’abord · Paramètres sécurisés',
     es: 'Rendimiento primero · Valores seguros por defecto',
     de: 'Performance zuerst · Sichere Standardwerte',
+    he: 'ביצועים קודם · ברירות מחדל מאובטחות',
   },
   'common.contact_link': {
     en: 'Contact',
@@ -250,6 +276,7 @@ const MATRIX = {
     fr: 'Contact',
     es: 'Contacto',
     de: 'Kontakt',
+    he: 'צור קשר',
   },
   'common.details': {
     en: 'Details →',
@@ -259,6 +286,7 @@ const MATRIX = {
     fr: 'Détails →',
     es: 'Detalles →',
     de: 'Details →',
+    he: 'פרטים ←',
   },
   'common.learn_more': {
     en: 'Learn more',
@@ -268,6 +296,7 @@ const MATRIX = {
     fr: 'En savoir plus',
     es: 'Saber más',
     de: 'Mehr erfahren',
+    he: 'למידע נוסף',
   },
   'common.visit_link': {
     en: 'Visit link →',
@@ -277,6 +306,7 @@ const MATRIX = {
     fr: 'Voir le lien →',
     es: 'Visitar enlace →',
     de: 'Link besuchen →',
+    he: 'בקר בקישור ←',
   },
   'common.overview': {
     en: 'Overview →',
@@ -286,6 +316,7 @@ const MATRIX = {
     fr: 'Aperçu →',
     es: 'Resumen →',
     de: 'Überblick →',
+    he: 'סקירה ←',
   },
   'common.read': {
     en: 'Read →',
@@ -295,6 +326,7 @@ const MATRIX = {
     fr: 'Lire →',
     es: 'Leer →',
     de: 'Lesen →',
+    he: 'קרא ←',
   },
   'common.live_link': {
     en: 'Live link',
@@ -304,6 +336,7 @@ const MATRIX = {
     fr: 'Lien direct',
     es: 'Enlace en vivo',
     de: 'Live-Link',
+    he: 'קישור חי',
   },
   'common.open_detail': {
     en: 'Open detail →',
@@ -313,6 +346,7 @@ const MATRIX = {
     fr: 'Ouvrir le détail →',
     es: 'Abrir detalle →',
     de: 'Detail öffnen →',
+    he: 'פתח פרטים ←',
   },
   'project.kind.project': {
     en: 'Project',
@@ -322,6 +356,7 @@ const MATRIX = {
     fr: 'Projet',
     es: 'Proyecto',
     de: 'Projekt',
+    he: 'פרויקט',
   },
   'project.kind.microsaas': {
     en: 'Micro-SaaS',
@@ -331,6 +366,7 @@ const MATRIX = {
     fr: 'Micro-SaaS',
     es: 'Micro-SaaS',
     de: 'Micro-SaaS',
+    he: 'Micro-SaaS',
   },
   'hero.kicker': {
     en: 'Digital studio · Product & web',
@@ -340,6 +376,7 @@ const MATRIX = {
     fr: 'Studio numérique · Produit & web',
     es: 'Estudio digital · Producto y web',
     de: 'Digital Studio · Produkt & Web',
+    he: 'סטודיו דיגיטלי · מוצר ואינטרנט',
   },
   'hero.meta_response': {
     en: 'avg. response',
@@ -349,6 +386,7 @@ const MATRIX = {
     fr: 'réponse moy.',
     es: 'resp. media',
     de: 'Ø Antwortzeit',
+    he: 'זמן תגובה ממוצע',
   },
   'hero.meta_remote': {
     en: 'remote-first',
@@ -358,6 +396,7 @@ const MATRIX = {
     fr: 'remote-first',
     es: 'remoto por defecto',
     de: 'Remote-first',
+    he: 'עבודה מרחוק כברירת מחדל',
   },
   'hero.meta_a11y': {
     en: 'Accessible by default',
@@ -367,6 +406,7 @@ const MATRIX = {
     fr: 'Accessible par défaut',
     es: 'Accesible por defecto',
     de: 'Standardmäßig barrierefrei',
+    he: 'נגיש כברירת מחדל',
   },
   'hero.stat_48h': {
     en: '48h',
@@ -376,6 +416,7 @@ const MATRIX = {
     fr: '48h',
     es: '48h',
     de: '48h',
+    he: '48 שעות',
   },
   'hero.stat_global': {
     en: 'Global',
@@ -385,6 +426,7 @@ const MATRIX = {
     fr: 'Monde',
     es: 'Global',
     de: 'Global',
+    he: 'גלובלי',
   },
   'home.banners_title': {
     en: 'Highlights',
@@ -394,6 +436,7 @@ const MATRIX = {
     fr: 'Temps forts',
     es: 'Destacados',
     de: 'Highlights',
+    he: 'נקודות עיקריות',
   },
   'home.banners_subtitle': {
     en: 'Curated snapshots of what we ship for partners.',
@@ -403,6 +446,7 @@ const MATRIX = {
     fr: 'Aperçus de ce que nous livrons pour nos partenaires.',
     es: 'Instantáneas de lo que entregamos a socios.',
     de: 'Höhepunkte unserer Partner-Lieferungen.',
+    he: 'מבחר תמציתי ממה שאנחנו מספקים לשותפים שלנו.',
   },
   'home.services_title': {
     en: 'Services',
@@ -412,6 +456,7 @@ const MATRIX = {
     fr: 'Services',
     es: 'Servicios',
     de: 'Leistungen',
+    he: 'שירותים',
   },
   'home.services_subtitle': {
     en: 'Focused capabilities that cover the full product lifecycle.',
@@ -421,6 +466,7 @@ const MATRIX = {
     fr: 'Capacités ciblées couvrant tout le cycle de vie du produit.',
     es: 'Capacidades que cubren todo el ciclo de vida del producto.',
     de: 'Fokussierte Kompetenzen über den gesamten Produktlebenszyklus.',
+    he: 'יכולות ממוקדות שמכסות את כל מחזור החיים של המוצר.',
   },
   'home.services_all': {
     en: 'All services',
@@ -430,6 +476,7 @@ const MATRIX = {
     fr: 'Tous les services',
     es: 'Todos los servicios',
     de: 'Alle Leistungen',
+    he: 'כל השירותים',
   },
   'home.projects_all': {
     en: 'All work',
@@ -439,6 +486,7 @@ const MATRIX = {
     fr: 'Tout le travail',
     es: 'Todo el trabajo',
     de: 'Alle Arbeiten',
+    he: 'כל העבודות',
   },
   'home.about_read': {
     en: 'Read our story',
@@ -448,6 +496,7 @@ const MATRIX = {
     fr: 'Notre histoire',
     es: 'Nuestra historia',
     de: 'Unsere Geschichte',
+    he: 'קראו את הסיפור שלנו',
   },
   'home.team_title': {
     en: 'Team preview',
@@ -457,6 +506,7 @@ const MATRIX = {
     fr: 'Aperçu équipe',
     es: 'Vista previa del equipo',
     de: 'Team-Vorschau',
+    he: 'הצוות שלנו',
   },
   'home.team_subtitle': {
     en: 'Senior practitioners embedded with your workflows.',
@@ -466,6 +516,7 @@ const MATRIX = {
     fr: 'Praticiens seniors intégrés à vos flux.',
     es: 'Profesionales senior integrados en tus flujos.',
     de: 'Senior-Leute in Ihren Abläufen.',
+    he: 'אנשי מקצוע בכירים שמשתלבים בתהליכי העבודה שלכם.',
   },
   'home.team_all': {
     en: 'Full team',
@@ -475,6 +526,7 @@ const MATRIX = {
     fr: 'Équipe complète',
     es: 'Equipo completo',
     de: 'Ganzes Team',
+    he: 'הצוות המלא',
   },
   'home.cta_title': {
     en: 'Ready when you are',
@@ -484,6 +536,7 @@ const MATRIX = {
     fr: 'Prêts quand vous l’êtes',
     es: 'Listos cuando tú lo estés',
     de: 'Bereit, wenn Sie es sind',
+    he: 'מוכנים כשאתם מוכנים',
   },
   'home.cta_lead': {
     en: 'Tell us about your goals—we will follow up with next steps and a clear scope proposal.',
@@ -493,6 +546,7 @@ const MATRIX = {
     fr: 'Parlez-nous de vos objectifs — nous proposerons la suite et un périmètre clair.',
     es: 'Cuéntanos tus objetivos — te responderemos con pasos y alcance claro.',
     de: 'Teilen Sie Ihre Ziele — wir melden uns mit nächsten Schritten und einem klaren Scope.',
+    he: 'ספרו לנו על המטרות שלכם — נחזור עם הצעדים הבאים והצעה ברורה להיקף העבודה.',
   },
   'home.cta_quick_title': {
     en: 'Quick message',
@@ -502,6 +556,7 @@ const MATRIX = {
     fr: 'Message rapide',
     es: 'Mensaje rápido',
     de: 'Kurze Nachricht',
+    he: 'הודעה מהירה',
   },
   'home.cta_full_link': {
     en: 'Full contact form →',
@@ -511,6 +566,7 @@ const MATRIX = {
     fr: 'Formulaire complet →',
     es: 'Formulario completo →',
     de: 'Vollständiges Formular →',
+    he: 'טופס יצירת קשר מלא ←',
   },
   'home.hero_placeholder': {
     en: 'Hero image — set in admin',
@@ -520,6 +576,7 @@ const MATRIX = {
     fr: 'Image hero — définie dans l’admin',
     es: 'Imagen hero — en admin',
     de: 'Hero-Bild — im Admin',
+    he: 'תמונת הירו — מוגדרת בלוח הניהול',
   },
   'form.name': {
     en: 'Name',
@@ -529,6 +586,7 @@ const MATRIX = {
     fr: 'Nom',
     es: 'Nombre',
     de: 'Name',
+    he: 'שם',
   },
   'form.email': {
     en: 'Email',
@@ -538,6 +596,7 @@ const MATRIX = {
     fr: 'E-mail',
     es: 'Correo',
     de: 'E-Mail',
+    he: 'אימייל',
   },
   'form.phone': {
     en: 'Phone (optional)',
@@ -547,6 +606,7 @@ const MATRIX = {
     fr: 'Téléphone (optionnel)',
     es: 'Teléfono (opcional)',
     de: 'Telefon (optional)',
+    he: 'טלפון (אופציונלי)',
   },
   'form.message': {
     en: 'Message',
@@ -556,6 +616,7 @@ const MATRIX = {
     fr: 'Message',
     es: 'Mensaje',
     de: 'Nachricht',
+    he: 'הודעה',
   },
   'form.message_prompt': {
     en: 'How can we help?',
@@ -565,6 +626,7 @@ const MATRIX = {
     fr: 'Comment pouvons-nous aider ?',
     es: '¿En qué podemos ayudarte?',
     de: 'Womit können wir helfen?',
+    he: 'איך נוכל לעזור?',
   },
   'form.attachment': {
     en: 'Attachment (optional — images, PDF, Word, max 5MB)',
@@ -574,6 +636,7 @@ const MATRIX = {
     fr: 'Pièce jointe (optionnel — images, PDF, Word, max 5 Mo)',
     es: 'Adjunto (opcional — imágenes, PDF, Word, máx. 5MB)',
     de: 'Anhang (optional — Bilder, PDF, Word, max. 5 MB)',
+    he: 'קובץ מצורף (אופציונלי — תמונות, PDF, Word, עד 5MB)',
   },
   'form.send': {
     en: 'Send',
@@ -583,6 +646,7 @@ const MATRIX = {
     fr: 'Envoyer',
     es: 'Enviar',
     de: 'Senden',
+    he: 'שליחה',
   },
   'form.submit': {
     en: 'Submit',
@@ -592,6 +656,7 @@ const MATRIX = {
     fr: 'Soumettre',
     es: 'Enviar',
     de: 'Absenden',
+    he: 'שליחה',
   },
   'contact.sent_ok': {
     en: 'Thank you — we will get back to you shortly.',
@@ -601,6 +666,7 @@ const MATRIX = {
     fr: 'Merci — nous revenons vers vous rapidement.',
     es: 'Gracias — te responderemos pronto.',
     de: 'Danke — wir melden uns bald.',
+    he: 'תודה — נחזור אליכם בקרוב.',
   },
   'contact.sent_ok_mini': {
     en: 'Sent! We will reply soon.',
@@ -610,6 +676,7 @@ const MATRIX = {
     fr: 'Envoyé ! Bientôt une réponse.',
     es: '¡Enviado! Responderemos pronto.',
     de: 'Gesendet! Wir melden uns bald.',
+    he: 'נשלח! נחזור אליכם בקרוב.',
   },
   'contact.error_generic': {
     en: 'Something went wrong.',
@@ -619,6 +686,7 @@ const MATRIX = {
     fr: 'Une erreur s’est produite.',
     es: 'Algo salió mal.',
     de: 'Etwas ist schiefgelaufen.',
+    he: 'משהו השתבש.',
   },
   'contact.error_network': {
     en: 'Network error. Please try again.',
@@ -628,6 +696,7 @@ const MATRIX = {
     fr: 'Erreur réseau. Réessayez.',
     es: 'Error de red. Inténtalo de nuevo.',
     de: 'Netzwerkfehler. Bitte erneut versuchen.',
+    he: 'שגיאת רשת. נסו שוב.',
   },
   'about.page_title': {
     en: 'About us',
@@ -637,6 +706,7 @@ const MATRIX = {
     fr: 'À propos',
     es: 'Sobre nosotros',
     de: 'Über uns',
+    he: 'אודותינו',
   },
   'about.page_lead': {
     en: 'How we work, what we optimize for, and why teams partner with us.',
@@ -646,6 +716,7 @@ const MATRIX = {
     fr: 'Notre méthode, nos priorités et pourquoi les équipes nous choisissent.',
     es: 'Cómo trabajamos, qué optimizamos y por qué los equipos confían en nosotros.',
     de: 'Wie wir arbeiten, was wir optimieren und warum Teams uns wählen.',
+    he: 'איך אנחנו עובדים, על מה אנחנו מתמקדים, ולמה צוותים בוחרים לעבוד איתנו.',
   },
   'about.mission_heading': {
     en: 'Mission',
@@ -655,6 +726,7 @@ const MATRIX = {
     fr: 'Mission',
     es: 'Misión',
     de: 'Mission',
+    he: 'המשימה',
   },
   'about.values_heading': {
     en: 'Values',
@@ -664,6 +736,7 @@ const MATRIX = {
     fr: 'Valeurs',
     es: 'Valores',
     de: 'Werte',
+    he: 'ערכים',
   },
   'about.work_with_us': {
     en: 'Work with us',
@@ -673,6 +746,7 @@ const MATRIX = {
     fr: 'Travailler avec nous',
     es: 'Trabaja con nosotros',
     de: 'Mit uns arbeiten',
+    he: 'עבדו איתנו',
   },
   'services.page_title': {
     en: 'Services',
@@ -682,6 +756,7 @@ const MATRIX = {
     fr: 'Services',
     es: 'Servicios',
     de: 'Leistungen',
+    he: 'שירותים',
   },
   'services.page_lead': {
     en: 'Modular engagements from discovery to launch—clarity in scope, measurable outcomes in delivery.',
@@ -691,6 +766,7 @@ const MATRIX = {
     fr: 'Engagements modulaires de la découverte au lancement — périmètre clair, résultats mesurables.',
     es: 'Compromisos modulares del descubrimiento al lanzamiento — alcance claro, resultados medibles.',
     de: 'Modulare Pakete von Discovery bis Launch — klarer Scope, messbare Ergebnisse.',
+    he: 'שירותים מודולריים מהאפיון ועד ההשקה — היקף ברור ותוצאות מדידות.',
   },
   'team.page_title': {
     en: 'Team',
@@ -700,6 +776,7 @@ const MATRIX = {
     fr: 'Équipe',
     es: 'Equipo',
     de: 'Team',
+    he: 'צוות',
   },
   'team.page_lead': {
     en: 'The people behind delivery—small, senior, and embedded with your stakeholders.',
@@ -709,6 +786,7 @@ const MATRIX = {
     fr: 'Les visages de la livraison — petits groupes, seniors, proches de vos parties prenantes.',
     es: 'Las personas detrás de la entrega — equipo reducido, senior y cercano a tus stakeholders.',
     de: 'Die Menschen hinter der Lieferung — schlank, senior, nah bei Ihren Stakeholdern.',
+    he: 'האנשים שמאחורי העבודה — צוות קטן, בכיר ומשולב עם בעלי העניין שלכם.',
   },
   'projects.page_title': {
     en: 'Projects & micro-SaaS',
@@ -718,6 +796,7 @@ const MATRIX = {
     fr: 'Projets & micro-SaaS',
     es: 'Proyectos y micro-SaaS',
     de: 'Projekte & Micro-SaaS',
+    he: 'פרויקטים ו-micro-SaaS',
   },
   'projects.page_lead': {
     en: 'Selected delivery work and a few internal products we use to keep our craft sharp.',
@@ -727,6 +806,7 @@ const MATRIX = {
     fr: 'Livraisons choisies et quelques produits internes pour affûter notre savoir-faire.',
     es: 'Trabajos seleccionados y algunos productos internos para mantener el oficio afilado.',
     de: 'Ausgewählte Arbeiten und ein paar interne Produkte, um die Qualität hochzuhalten.',
+    he: 'עבודות נבחרות וכמה מוצרים פנימיים שבעזרתם אנחנו שומרים על המקצועיות שלנו חדה.',
   },
   'blog.page_title': {
     en: 'Blog & news',
@@ -736,6 +816,7 @@ const MATRIX = {
     fr: 'Blog & actus',
     es: 'Blog y noticias',
     de: 'Blog & News',
+    he: 'בלוג וחדשות',
   },
   'blog.page_lead': {
     en: 'Notes on delivery, product, and studio life.',
@@ -745,6 +826,7 @@ const MATRIX = {
     fr: 'Notes sur la livraison, le produit et la vie du studio.',
     es: 'Notas sobre entrega, producto y vida del estudio.',
     de: 'Notizen zu Delivery, Produkt und Studioalltag.',
+    he: 'הערות על אספקה, מוצר וחיי הסטודיו.',
   },
   'blog.search_placeholder': {
     en: 'Search posts…',
@@ -754,6 +836,7 @@ const MATRIX = {
     fr: 'Rechercher…',
     es: 'Buscar…',
     de: 'Suchen…',
+    he: 'חיפוש פוסטים…',
   },
   'blog.search': {
     en: 'Search',
@@ -763,6 +846,7 @@ const MATRIX = {
     fr: 'Rechercher',
     es: 'Buscar',
     de: 'Suchen',
+    he: 'חיפוש',
   },
   'blog.all': {
     en: 'All',
@@ -772,6 +856,7 @@ const MATRIX = {
     fr: 'Tous',
     es: 'Todos',
     de: 'Alle',
+    he: 'הכול',
   },
   'blog.previous': {
     en: 'Previous',
@@ -781,6 +866,7 @@ const MATRIX = {
     fr: 'Précédent',
     es: 'Anterior',
     de: 'Zurück',
+    he: 'הקודם',
   },
   'blog.next': {
     en: 'Next',
@@ -790,6 +876,7 @@ const MATRIX = {
     fr: 'Suivant',
     es: 'Siguiente',
     de: 'Weiter',
+    he: 'הבא',
   },
   'blog.page_of': {
     en: 'Page {page} / {total}',
@@ -799,6 +886,7 @@ const MATRIX = {
     fr: 'Page {page} / {total}',
     es: 'Página {page} / {total}',
     de: 'Seite {page} / {total}',
+    he: 'עמוד {page} / {total}',
   },
   'blog.views': {
     en: 'views',
@@ -808,6 +896,7 @@ const MATRIX = {
     fr: 'vues',
     es: 'vistas',
     de: 'Aufrufe',
+    he: 'צפיות',
   },
   'blog.no_posts': {
     en: 'No posts match your filters.',
@@ -817,6 +906,7 @@ const MATRIX = {
     fr: 'Aucun article ne correspond aux filtres.',
     es: 'No hay entradas que coincidan.',
     de: 'Keine Beiträge passen zu den Filtern.',
+    he: 'אין פוסטים התואמים לסינון.',
   },
   'blog.load_error': {
     en: 'Could not load posts.',
@@ -826,6 +916,7 @@ const MATRIX = {
     fr: 'Impossible de charger les articles.',
     es: 'No se pudieron cargar las entradas.',
     de: 'Beiträge konnten nicht geladen werden.',
+    he: 'לא ניתן היה לטעון את הפוסטים.',
   },
   'contact.page_title': {
     en: 'Contact',
@@ -835,6 +926,7 @@ const MATRIX = {
     fr: 'Contact',
     es: 'Contacto',
     de: 'Kontakt',
+    he: 'צור קשר',
   },
   'contact.page_lead': {
     en: 'Share context, timeline, and goals. We respond within two business days with suggested next steps.',
@@ -844,6 +936,7 @@ const MATRIX = {
     fr: 'Contexte, calendrier et objectifs. Réponse sous deux jours ouvrés avec prochaines étapes.',
     es: 'Contexto, plazos y objetivos. Respondemos en dos días hábiles con siguientes pasos.',
     de: 'Kontext, Zeitplan und Ziele. Antwort innerhalb von zwei Werktagen mit nächsten Schritten.',
+    he: 'שתפו הקשר, לוח זמנים ומטרות. נחזור אליכם תוך יומיים עסקיים עם הצעה לצעדים הבאים.',
   },
   'contact.map': {
     en: 'Map',
@@ -853,6 +946,7 @@ const MATRIX = {
     fr: 'Carte',
     es: 'Mapa',
     de: 'Karte',
+    he: 'מפה',
   },
   'contact.map_note': {
     en: 'Embed URL is configurable in the admin panel.',
@@ -862,6 +956,7 @@ const MATRIX = {
     fr: 'L’URL d’intégration est configurable dans l’admin.',
     es: 'La URL del embed se configura en el admin.',
     de: 'Die Embed-URL ist im Admin konfigurierbar.',
+    he: 'ניתן להגדיר את כתובת ההטמעה בלוח הניהול.',
   },
   'contact.hours': {
     en: 'Office hours',
@@ -871,6 +966,7 @@ const MATRIX = {
     fr: 'Horaires',
     es: 'Horario',
     de: 'Erreichbarkeit',
+    he: 'שעות פעילות',
   },
   'contact.hours_remote': {
     en: 'Remote-first, time zones: Americas · EU',
@@ -880,6 +976,7 @@ const MATRIX = {
     fr: 'Remote-first, fuseaux : Amériques · UE',
     es: 'Remoto primero, zonas: Américas · UE',
     de: 'Remote-first, Zeitzonen: Amerikas · EU',
+    he: 'עבודה מרחוק בראש ובראשונה, אזורי זמן: אמריקה · האיחוד האירופי',
   },
   'contact.hours_files': {
     en: 'Secure file sharing available on request',
@@ -889,6 +986,7 @@ const MATRIX = {
     fr: 'Partage de fichiers sécurisé sur demande',
     es: 'Intercambio seguro de archivos bajo solicitud',
     de: 'Sicherer Dateitausch auf Anfrage',
+    he: 'שיתוף קבצים מאובטח זמין לפי בקשה',
   },
   'contact.hours_spam': {
     en: 'No spam—your note stays with our core team',
@@ -898,6 +996,7 @@ const MATRIX = {
     fr: 'Pas de spam — votre message reste dans l’équipe cœur',
     es: 'Sin spam — tu mensaje queda en el equipo central',
     de: 'Kein Spam — Ihre Nachricht bleibt beim Kernteam',
+    he: 'בלי ספאם — ההודעה שלכם נשארת אצל צוות הליבה שלנו',
   },
   'contact.form_title': {
     en: 'Send a message',
@@ -907,6 +1006,7 @@ const MATRIX = {
     fr: 'Envoyer un message',
     es: 'Enviar mensaje',
     de: 'Nachricht senden',
+    he: 'שלחו הודעה',
   },
   'service.missing': {
     en: 'Missing service.',
@@ -916,6 +1016,7 @@ const MATRIX = {
     fr: 'Service manquant.',
     es: 'Servicio no encontrado.',
     de: 'Service fehlt.',
+    he: 'השירות חסר.',
   },
   'service.not_found': {
     en: 'Not found.',
@@ -925,6 +1026,7 @@ const MATRIX = {
     fr: 'Introuvable.',
     es: 'No encontrado.',
     de: 'Nicht gefunden.',
+    he: 'לא נמצא.',
   },
   'service.back': {
     en: 'Back to services',
@@ -934,6 +1036,7 @@ const MATRIX = {
     fr: 'Retour aux services',
     es: 'Volver a servicios',
     de: 'Zurück zu Leistungen',
+    he: 'חזרה לשירותים',
   },
   'service.discuss': {
     en: 'Discuss this engagement',
@@ -943,6 +1046,7 @@ const MATRIX = {
     fr: 'Discuter de ce mandat',
     es: 'Hablemos de este encargo',
     de: 'Dieses Engagement besprechen',
+    he: 'בואו נדבר על השירות הזה',
   },
   'project.missing': {
     en: 'Missing project.',
@@ -952,6 +1056,7 @@ const MATRIX = {
     fr: 'Projet manquant.',
     es: 'Proyecto no encontrado.',
     de: 'Projekt fehlt.',
+    he: 'הפרויקט חסר.',
   },
   'project.not_found': {
     en: 'Not found.',
@@ -961,6 +1066,7 @@ const MATRIX = {
     fr: 'Introuvable.',
     es: 'No encontrado.',
     de: 'Nicht gefunden.',
+    he: 'לא נמצא.',
   },
   'project.back': {
     en: 'Work',
@@ -970,6 +1076,7 @@ const MATRIX = {
     fr: 'Réalisations',
     es: 'Trabajo',
     de: 'Referenzen',
+    he: 'עבודות',
   },
   'post.missing': {
     en: 'Missing post.',
@@ -979,6 +1086,7 @@ const MATRIX = {
     fr: 'Article manquant.',
     es: 'Entrada no encontrada.',
     de: 'Beitrag fehlt.',
+    he: 'הפוסט חסר.',
   },
   'post.not_found': {
     en: 'Not found.',
@@ -988,6 +1096,7 @@ const MATRIX = {
     fr: 'Introuvable.',
     es: 'No encontrado.',
     de: 'Nicht gefunden.',
+    he: 'לא נמצא.',
   },
   'post.back': {
     en: 'Blog',
@@ -997,6 +1106,7 @@ const MATRIX = {
     fr: 'Blog',
     es: 'Blog',
     de: 'Blog',
+    he: 'בלוג',
   },
   'nav.back_services': {
     en: '← All services',
@@ -1006,6 +1116,7 @@ const MATRIX = {
     fr: '← Tous les services',
     es: '← Todos los servicios',
     de: '← Alle Leistungen',
+    he: '→ כל השירותים',
   },
   'nav.back_work': {
     en: '← All work',
@@ -1015,6 +1126,7 @@ const MATRIX = {
     fr: '← Toutes les réalisations',
     es: '← Todo el trabajo',
     de: '← Alle Referenzen',
+    he: '→ כל העבודות',
   },
   'nav.back_blog': {
     en: '← Blog',
@@ -1024,6 +1136,7 @@ const MATRIX = {
     fr: '← Blog',
     es: '← Blog',
     de: '← Blog',
+    he: '→ בלוג',
   },
   'cookie.text': {
     en: 'This site uses cookies for session and analytics purposes.',
@@ -1033,6 +1146,7 @@ const MATRIX = {
     fr: 'Ce site utilise des cookies pour la session et les statistiques.',
     es: 'Este sitio utiliza cookies para la sesión y con fines analíticos.',
     de: 'Diese Website verwendet Cookies für Sitzungen und Analysezwecke.',
+    he: 'אתר זה משתמש בעוגיות לצורכי הפעלה (סשן) וניתוח נתונים.',
   },
   'cookie.accept': {
     en: 'Accept',
@@ -1042,6 +1156,7 @@ const MATRIX = {
     fr: 'Accepter',
     es: 'Aceptar',
     de: 'Akzeptieren',
+    he: 'אישור',
   },
   'cookie.decline': {
     en: 'Decline',
@@ -1051,6 +1166,7 @@ const MATRIX = {
     fr: 'Refuser',
     es: 'Rechazar',
     de: 'Ablehnen',
+    he: 'דחייה',
   },
   'cookie.aria': {
     en: 'Cookie consent',
@@ -1060,6 +1176,7 @@ const MATRIX = {
     fr: 'Consentement aux cookies',
     es: 'Consentimiento de cookies',
     de: 'Cookie-Einwilligung',
+    he: 'הסכמה לעוגיות',
   },
   'newsletter.title': {
     en: 'Newsletter',
@@ -1069,6 +1186,7 @@ const MATRIX = {
     fr: 'Newsletter',
     es: 'Boletín',
     de: 'Newsletter',
+    he: 'ניוזלטר',
   },
   'newsletter.lead': {
     en: 'Occasional updates. Unsubscribe anytime using the link in your emails.',
@@ -1078,6 +1196,7 @@ const MATRIX = {
     fr: 'Actualités occasionnelles. Désinscription à tout moment via le lien dans nos e-mails.',
     es: 'Novedades ocasionales. Puedes darte de baja en cualquier momento con el enlace de nuestros correos.',
     de: 'Gelegentliche Neuigkeiten. Abmeldung jederzeit über den Link in unseren E-Mails.',
+    he: 'עדכונים מדי פעם. אפשר לבטל את המנוי בכל עת דרך הקישור במיילים.',
   },
   'newsletter.subscribe': {
     en: 'Subscribe',
@@ -1087,6 +1206,7 @@ const MATRIX = {
     fr: 'S’abonner',
     es: 'Suscribirse',
     de: 'Abonnieren',
+    he: 'הרשמה',
   },
   'newsletter.email_aria': {
     en: 'Email for newsletter',
@@ -1096,6 +1216,7 @@ const MATRIX = {
     fr: 'E-mail pour la newsletter',
     es: 'Correo para el boletín',
     de: 'E-Mail für den Newsletter',
+    he: 'אימייל לניוזלטר',
   },
   'newsletter.pending': {
     en: 'Almost done — check your inbox and click the confirmation link.',
@@ -1105,6 +1226,7 @@ const MATRIX = {
     fr: 'Presque terminé — consultez votre boîte mail et cliquez sur le lien de confirmation.',
     es: 'Casi listo: revisa tu bandeja de entrada y haz clic en el enlace de confirmación.',
     de: 'Fast geschafft – prüfen Sie Ihr Postfach und klicken Sie auf den Bestätigungslink.',
+    he: 'כמעט סיימנו — בדקו את תיבת הדואר ולחצו על קישור האישור.',
   },
   'home.projects_title_fallback': {
     en: 'Projects',
@@ -1114,6 +1236,7 @@ const MATRIX = {
     fr: 'Projets',
     es: 'Proyectos',
     de: 'Projekte',
+    he: 'פרויקטים',
   },
   'confirm.title': {
     en: 'Confirm your subscription',
@@ -1123,6 +1246,7 @@ const MATRIX = {
     fr: 'Confirmez votre abonnement',
     es: 'Confirma tu suscripción',
     de: 'Bestätigen Sie Ihr Abonnement',
+    he: 'אשרו את המנוי שלכם',
   },
   'confirm.ready': {
     en: 'Press the button to confirm your newsletter subscription.',
@@ -1132,6 +1256,7 @@ const MATRIX = {
     fr: 'Appuyez sur le bouton pour confirmer votre abonnement à la newsletter.',
     es: 'Pulsa el botón para confirmar tu suscripción al boletín.',
     de: 'Klicken Sie auf die Schaltfläche, um Ihr Newsletter-Abonnement zu bestätigen.',
+    he: 'לחצו על הכפתור כדי לאשר את המנוי שלכם לניוזלטר.',
   },
   'confirm.button': {
     en: 'Confirm subscription',
@@ -1141,6 +1266,7 @@ const MATRIX = {
     fr: 'Confirmer l’abonnement',
     es: 'Confirmar suscripción',
     de: 'Abonnement bestätigen',
+    he: 'אישור המנוי',
   },
   'confirm.done': {
     en: 'Thank you — your subscription is confirmed.',
@@ -1150,6 +1276,7 @@ const MATRIX = {
     fr: 'Merci — votre abonnement est confirmé.',
     es: 'Gracias — tu suscripción está confirmada.',
     de: 'Danke – Ihr Abonnement ist bestätigt.',
+    he: 'תודה — המנוי שלך אושר.',
   },
   'confirm.fail': {
     en: 'This confirmation link is invalid or has expired.',
@@ -1159,6 +1286,7 @@ const MATRIX = {
     fr: 'Ce lien de confirmation est invalide ou a expiré.',
     es: 'Este enlace de confirmación no es válido o ha caducado.',
     de: 'Dieser Bestätigungslink ist ungültig oder abgelaufen.',
+    he: 'קישור האישור אינו תקף או שפג תוקפו.',
   },
   'confirm.note': {
     en: 'Confirmation links are unique to your request and expire after 3 days. If this page shows an error, subscribe again from the form in the footer.',
@@ -1168,6 +1296,7 @@ const MATRIX = {
     fr: 'Les liens de confirmation sont uniques et expirent après 3 jours. En cas d’erreur, abonnez-vous à nouveau depuis le formulaire en bas de page.',
     es: 'Los enlaces de confirmación son únicos y caducan a los 3 días. Si ves un error, vuelve a suscribirte desde el formulario del pie de página.',
     de: 'Bestätigungslinks sind einmalig und verfallen nach 3 Tagen. Bei einem Fehler melden Sie sich erneut über das Formular im Seitenfuß an.',
+    he: 'קישורי האישור ייחודיים לבקשה שלך ופוקעים לאחר 3 ימים. אם הדף מציג שגיאה, הירשמו שוב דרך הטופס בתחתית האתר.',
   },
   'unsub.title': {
     en: 'Newsletter unsubscribe',
@@ -1177,6 +1306,7 @@ const MATRIX = {
     fr: 'Désabonnement de la newsletter',
     es: 'Cancelar suscripción al boletín',
     de: 'Newsletter abbestellen',
+    he: 'ביטול מנוי לניוזלטר',
   },
   'unsub.ready': {
     en: 'Press the button to unsubscribe from the newsletter.',
@@ -1186,6 +1316,7 @@ const MATRIX = {
     fr: 'Appuyez sur le bouton pour vous désabonner de la newsletter.',
     es: 'Pulsa el botón para darte de baja del boletín.',
     de: 'Klicken Sie auf die Schaltfläche, um den Newsletter abzubestellen.',
+    he: 'לחצו על הכפתור כדי לבטל את המנוי לניוזלטר.',
   },
   'unsub.button': {
     en: 'Unsubscribe',
@@ -1195,6 +1326,7 @@ const MATRIX = {
     fr: 'Se désabonner',
     es: 'Darme de baja',
     de: 'Abbestellen',
+    he: 'ביטול מנוי',
   },
   'unsub.done': {
     en: 'You have been unsubscribed from the newsletter.',
@@ -1204,6 +1336,7 @@ const MATRIX = {
     fr: 'Vous avez été désabonné(e) de la newsletter.',
     es: 'Te has dado de baja del boletín.',
     de: 'Sie wurden vom Newsletter abgemeldet.',
+    he: 'המנוי שלך לניוזלטר בוטל.',
   },
   'unsub.already': {
     en: 'You were already unsubscribed.',
@@ -1213,6 +1346,7 @@ const MATRIX = {
     fr: 'Vous étiez déjà désabonné(e).',
     es: 'Ya estabas dado de baja.',
     de: 'Sie waren bereits abgemeldet.',
+    he: 'כבר ביטלת את המנוי.',
   },
   'unsub.fail': {
     en: 'This link is invalid or no longer active.',
@@ -1222,6 +1356,7 @@ const MATRIX = {
     fr: 'Ce lien est invalide ou n’est plus actif.',
     es: 'Este enlace no es válido o ya no está activo.',
     de: 'Dieser Link ist ungültig oder nicht mehr aktiv.',
+    he: 'הקישור אינו תקף או שאינו פעיל עוד.',
   },
   'unsub.note': {
     en: 'Unsubscribe links are unique to your subscription. If this page shows an error, use the link from your most recent email or contact us for help.',
@@ -1231,6 +1366,7 @@ const MATRIX = {
     fr: 'Les liens de désabonnement sont propres à votre abonnement. En cas d’erreur, utilisez le lien de votre dernier e-mail ou contactez-nous.',
     es: 'Los enlaces de baja son únicos para tu suscripción. Si ves un error, usa el enlace de tu correo más reciente o contáctanos.',
     de: 'Abmeldelinks gelten nur für Ihr Abonnement. Bei einem Fehler nutzen Sie den Link aus Ihrer letzten E-Mail oder kontaktieren Sie uns.',
+    he: 'קישורי ביטול המנוי ייחודיים למנוי שלכם. אם הדף מציג שגיאה, השתמשו בקישור מהמייל האחרון שקיבלתם או צרו איתנו קשר.',
   },
   'token.missing': {
     en: 'Missing token in the URL. Open the link from your email.',
@@ -1240,6 +1376,7 @@ const MATRIX = {
     fr: 'Jeton manquant dans l’URL. Ouvrez le lien de votre e-mail.',
     es: 'Falta el token en la URL. Abre el enlace de tu correo.',
     de: 'Token in der URL fehlt. Öffnen Sie den Link aus Ihrer E-Mail.',
+    he: 'חסר אסימון (token) בכתובת. פתחו את הקישור מהמייל.',
   },
   'contact.err_name': {
     en: 'Please enter your name.',
@@ -1249,6 +1386,7 @@ const MATRIX = {
     fr: 'Veuillez saisir votre nom.',
     es: 'Por favor, introduce tu nombre.',
     de: 'Bitte geben Sie Ihren Namen ein.',
+    he: 'נא להזין את שמך.',
   },
   'contact.err_email': {
     en: 'Please enter a valid email.',
@@ -1258,6 +1396,7 @@ const MATRIX = {
     fr: 'Veuillez saisir un e-mail valide.',
     es: 'Por favor, introduce un correo válido.',
     de: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+    he: 'נא להזין כתובת אימייל תקינה.',
   },
   'contact.err_message': {
     en: 'Please enter a longer message.',
@@ -1267,6 +1406,7 @@ const MATRIX = {
     fr: 'Veuillez écrire un message plus long.',
     es: 'Por favor, escribe un mensaje más largo.',
     de: 'Bitte schreiben Sie eine längere Nachricht.',
+    he: 'נא לכתוב הודעה ארוכה יותר.',
   },
   'contact.err_limit': {
     en: 'Too many requests. Try again later.',
@@ -1276,6 +1416,7 @@ const MATRIX = {
     fr: 'Trop de requêtes. Réessayez plus tard.',
     es: 'Demasiadas solicitudes. Inténtalo más tarde.',
     de: 'Zu viele Anfragen. Bitte später erneut versuchen.',
+    he: 'יותר מדי בקשות. נסו שוב מאוחר יותר.',
   },
   'contact.err_unavailable': {
     en: 'The contact form is not available right now.',
@@ -1285,6 +1426,7 @@ const MATRIX = {
     fr: 'Le formulaire de contact n’est pas disponible pour le moment.',
     es: 'El formulario de contacto no está disponible en este momento.',
     de: 'Das Kontaktformular ist derzeit nicht verfügbar.',
+    he: 'טופס יצירת הקשר אינו זמין כרגע.',
   },
   'contact.err_send': {
     en: 'Could not send your message. Please try again later.',
@@ -1294,6 +1436,7 @@ const MATRIX = {
     fr: 'Impossible d’envoyer votre message. Réessayez plus tard.',
     es: 'No se pudo enviar tu mensaje. Inténtalo de nuevo más tarde.',
     de: 'Ihre Nachricht konnte nicht gesendet werden. Bitte später erneut versuchen.',
+    he: 'לא ניתן היה לשלוח את ההודעה. נסו שוב מאוחר יותר.',
   },
   'contact.err_email_us': {
     en: 'Please email us at',
@@ -1303,6 +1446,7 @@ const MATRIX = {
     fr: 'Écrivez-nous à',
     es: 'Escríbenos a',
     de: 'Schreiben Sie uns an',
+    he: 'נא לשלוח לנו אימייל לכתובת',
   },
 };
 

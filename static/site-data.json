@@ -1,5 +1,5 @@
 {
-  "exportedAt": "2026-10-20T12:43:25.045Z",
+  "exportedAt": "2026-10-20T13:57:56.459Z",
   "sites": {
     "en": {
       "ok": true,
@@ -123,7 +123,7 @@
           "linkUrl": "https://example.com/orbit",
           "featured": 1,
           "sortOrder": 1,
-          "viewCount": 462
+          "viewCount": 474
         },
         {
           "id": 2,
@@ -301,7 +301,7 @@
           "linkUrl": "https://example.com/orbit",
           "featured": 1,
           "sortOrder": 1,
-          "viewCount": 462
+          "viewCount": 474
         },
         {
           "id": 2,
@@ -479,7 +479,7 @@
           "linkUrl": "https://example.com/orbit",
           "featured": 1,
           "sortOrder": 1,
-          "viewCount": 462
+          "viewCount": 474
         },
         {
           "id": 2,
@@ -657,7 +657,7 @@
           "linkUrl": "https://example.com/orbit",
           "featured": 1,
           "sortOrder": 1,
-          "viewCount": 462
+          "viewCount": 474
         },
         {
           "id": 2,
@@ -835,7 +835,7 @@
           "linkUrl": "https://example.com/orbit",
           "featured": 1,
           "sortOrder": 1,
-          "viewCount": 462
+          "viewCount": 474
         },
         {
           "id": 2,
@@ -1013,7 +1013,7 @@
           "linkUrl": "https://example.com/orbit",
           "featured": 1,
           "sortOrder": 1,
-          "viewCount": 462
+          "viewCount": 474
         },
         {
           "id": 2,
@@ -1191,7 +1191,185 @@
           "linkUrl": "https://example.com/orbit",
           "featured": 1,
           "sortOrder": 1,
-          "viewCount": 462
+          "viewCount": 474
+        },
+        {
+          "id": 2,
+          "kind": "microsaas",
+          "title": "PulsePing",
+          "slug": "pulseping-microsaas",
+          "shortDesc": "Uptime alerts and status pages for lean teams—our in-house micro-SaaS.",
+          "longDesc": "Born from client requests for simpler incident comms. PulsePing combines monitoring hooks, Slack integration, and branded status pages.\n\nSubscription billing and team seats included.",
+          "image": "",
+          "linkUrl": "https://example.com/pulseping",
+          "featured": 1,
+          "sortOrder": 2,
+          "viewCount": 890
+        },
+        {
+          "id": 3,
+          "kind": "project",
+          "title": "Harbor Retail Omnichannel",
+          "slug": "harbor-retail",
+          "shortDesc": "Unified commerce experience across web, in-store kiosks, and staff tools.",
+          "longDesc": "Discovery through launch: inventory sync, cart persistence, and BOPIS flows. Close collaboration with legal and compliance on regional variants.",
+          "image": "",
+          "linkUrl": "https://example.com/harbor",
+          "featured": 1,
+          "sortOrder": 3,
+          "viewCount": 315
+        },
+        {
+          "id": 4,
+          "kind": "microsaas",
+          "title": "SnippetVault",
+          "slug": "snippetvault",
+          "shortDesc": "Team snippet manager with shared variables and environment-scoped secrets (demo product).",
+          "longDesc": "SnippetVault showcases secure sharing patterns we reuse in client work—scoped tokens, audit trails, and editor integrations.\n\nNot production for external signups; reference architecture only.",
+          "image": "",
+          "linkUrl": "https://example.com/snippetvault",
+          "featured": 0,
+          "sortOrder": 4,
+          "viewCount": 210
+        },
+        {
+          "id": 5,
+          "kind": "project",
+          "title": "Aperture Health Portal",
+          "slug": "aperture-health",
+          "shortDesc": "Patient-facing portal with appointment scheduling and encrypted messaging.",
+          "longDesc": "Accessibility-first UI, WCAG 2.2 AA target, and hardened session handling. Worked alongside clinical stakeholders for safe consent flows.",
+          "image": "",
+          "linkUrl": "https://example.com/aperture",
+          "featured": 0,
+          "sortOrder": 5,
+          "viewCount": 156
+        }
+      ]
+    },
+    "he": {
+      "ok": true,
+      "site": {
+        "companyName": "Nexus Studio",
+        "hero": {
+          "title": "בנו חוויות דיגיטליות נועזות",
+          "subtitle": "אסטרטגיה, עיצוב והנדסה שעוזרים לחברות צומחות להשיק מוצרים שהלקוחות אוהבים — בזמן ובהתאם למותג.",
+          "image": "",
+          "ctaPrimary": {
+            "text": "צפו בשירותים",
+            "link": "/services.html"
+          },
+          "ctaSecondary": {
+            "text": "צרו קשר",
+            "link": "/contact.html"
+          }
+        },
+        "homeAbout": {
+          "title": "על הסטודיו שלנו",
+          "text": "אנחנו צוות רב־תחומי שמתמקד בבהירות, בביצועים ובתוצאות. מהאפיון ועד ההשקה, אנחנו לצדכם.",
+          "image": ""
+        },
+        "aboutPage": {
+          "title": "Our story",
+          "lead": "Founded on the belief that great products start with great collaboration.",
+          "body": "We blend research, design systems, and modern engineering to deliver scalable web experiences. Our process is transparent, measurable, and built around your goals.\n\nWhether you need a new marketing site, a product interface, or ongoing optimization—we bring senior-level craft without enterprise overhead.",
+          "mission": "Empower teams to ship high-quality digital products with confidence.",
+          "values": "Clarity, accountability, accessibility, performance, and long-term maintainability."
+        },
+        "footerTagline": "© Nexus Studio. נוצר בקפידה עבור צוותים שאפתניים.",
+        "banners": [
+          {
+            "image": "",
+            "title": "Launch-ready websites",
+            "subtitle": "Performance-first builds that scale with your business.",
+            "link": "/services.html",
+            "linkText": "Explore services"
+          },
+          {
+            "image": "",
+            "title": "Design systems that stick",
+            "subtitle": "Cohesive UI patterns for faster iterations.",
+            "link": "/team.html",
+            "linkText": "Meet the team"
+          }
+        ],
+        "homeProjectsTitle": "פרויקטים ו-micro-SaaS",
+        "homeProjectsIntro": "משיקים מוצרים ללקוחות — וגם כמה יוזמות קטנות משלנו — שכבר פועלים בייצור.",
+        "featureFlags": {
+          "showProjects": true,
+          "showBlog": true
+        },
+        "defaultLocale": "en",
+        "activeLocale": "he"
+      },
+      "services": [
+        {
+          "id": 1,
+          "title": "Strategy & discovery",
+          "slug": "strategy-discovery",
+          "shortDesc": "Workshops, roadmaps, and prioritization grounded in user evidence.",
+          "longDesc": "We align stakeholders, clarify outcomes, and define a pragmatic plan. Deliverables include UX audits, technical feasibility notes, and a milestone roadmap your team can execute against.",
+          "icon": "compass",
+          "image": "",
+          "featured": 1
+        },
+        {
+          "id": 2,
+          "title": "Product design",
+          "slug": "product-design",
+          "shortDesc": "Interfaces that feel effortless—accessible, responsive, and on-brand.",
+          "longDesc": "From wireframes to high-fidelity UI, we craft flows that reduce friction. We document components and states so engineering can move quickly without guesswork.",
+          "icon": "pen",
+          "image": "",
+          "featured": 1
+        },
+        {
+          "id": 3,
+          "title": "Web development",
+          "slug": "web-development",
+          "shortDesc": "Fast, secure frontends with clean architecture and observability.",
+          "longDesc": "We ship production-ready builds with performance budgets, sensible security defaults, and maintainable code structure—ready for your next phase of growth.",
+          "icon": "code",
+          "image": "",
+          "featured": 1
+        }
+      ],
+      "teamPreview": [
+        {
+          "id": 1,
+          "name": "Alex Rivera",
+          "role": "Founder & Creative Director",
+          "bio": "Leads vision, brand, and client partnerships.",
+          "image": ""
+        },
+        {
+          "id": 2,
+          "name": "Jordan Lee",
+          "role": "Lead Engineer",
+          "bio": "Architecture, performance, and developer experience.",
+          "image": ""
+        },
+        {
+          "id": 3,
+          "name": "Sam Patel",
+          "role": "Product Designer",
+          "bio": "Research, UX flows, and interface craft.",
+          "image": ""
+        }
+      ],
+      "projectPreview": [
+        {
+          "id": 1,
+          "kind": "project",
+          "title": "Orbit Analytics Platform",
+          "slug": "orbit-analytics",
+          "shortDesc": "Multi-tenant dashboards for operations teams with real-time KPIs.",
+          "longDesc": "A full redesign and rebuild of the core reporting experience. Role-based views, scheduled exports, and drill-downs that stay fast at scale.\n\nStack: React, Node, Postgres. Engagements included UX research, UI system, and observability hardening.",
+          "image": "",
+          "linkUrl": "https://example.com/orbit",
+          "featured": 1,
+          "sortOrder": 1,
+          "viewCount": 474
         },
         {
           "id": 2,
@@ -2263,6 +2441,151 @@
       "contact.err_unavailable": "Das Kontaktformular ist derzeit nicht verfügbar.",
       "contact.err_send": "Ihre Nachricht konnte nicht gesendet werden. Bitte später erneut versuchen.",
       "contact.err_email_us": "Schreiben Sie uns an"
+    },
+    "he": {
+      "company_name": "Nexus Studio",
+      "hero_title": "בנו חוויות דיגיטליות נועזות",
+      "hero_subtitle": "אסטרטגיה, עיצוב והנדסה שעוזרים לחברות צומחות להשיק מוצרים שהלקוחות אוהבים — בזמן ובהתאם למותג.",
+      "hero_cta_primary_text": "צפו בשירותים",
+      "hero_cta_secondary_text": "צרו קשר",
+      "footer_tagline": "© Nexus Studio. נוצר בקפידה עבור צוותים שאפתניים.",
+      "home_about_title": "על הסטודיו שלנו",
+      "home_about_text": "אנחנו צוות רב־תחומי שמתמקד בבהירות, בביצועים ובתוצאות. מהאפיון ועד ההשקה, אנחנו לצדכם.",
+      "home_projects_title": "פרויקטים ו-micro-SaaS",
+      "home_projects_intro": "משיקים מוצרים ללקוחות — וגם כמה יוזמות קטנות משלנו — שכבר פועלים בייצור.",
+      "nav.home": "בית",
+      "nav.about": "אודות",
+      "nav.services": "שירותים",
+      "nav.work": "עבודות",
+      "nav.blog": "בלוג",
+      "nav.team": "צוות",
+      "nav.contact": "צור קשר",
+      "nav.cta_project": "התחילו פרויקט",
+      "nav.lang": "שפה",
+      "nav.menu_aria": "פתח תפריט",
+      "footer.tagline_extra": "אסטרטגיה, עיצוב והנדסה לצוותים שאכפת להם מאיכות.",
+      "footer.explore": "גלו",
+      "footer.admin": "ניהול",
+      "footer.content_admin": "ניהול תוכן",
+      "footer.performance": "ביצועים קודם · ברירות מחדל מאובטחות",
+      "common.contact_link": "צור קשר",
+      "common.details": "פרטים ←",
+      "common.learn_more": "למידע נוסף",
+      "common.visit_link": "בקר בקישור ←",
+      "common.overview": "סקירה ←",
+      "common.read": "קרא ←",
+      "common.live_link": "קישור חי",
+      "common.open_detail": "פתח פרטים ←",
+      "project.kind.project": "פרויקט",
+      "project.kind.microsaas": "Micro-SaaS",
+      "hero.kicker": "סטודיו דיגיטלי · מוצר ואינטרנט",
+      "hero.meta_response": "זמן תגובה ממוצע",
+      "hero.meta_remote": "עבודה מרחוק כברירת מחדל",
+      "hero.meta_a11y": "נגיש כברירת מחדל",
+      "hero.stat_48h": "48 שעות",
+      "hero.stat_global": "גלובלי",
+      "home.banners_title": "נקודות עיקריות",
+      "home.banners_subtitle": "מבחר תמציתי ממה שאנחנו מספקים לשותפים שלנו.",
+      "home.services_title": "שירותים",
+      "home.services_subtitle": "יכולות ממוקדות שמכסות את כל מחזור החיים של המוצר.",
+      "home.services_all": "כל השירותים",
+      "home.projects_all": "כל העבודות",
+      "home.about_read": "קראו את הסיפור שלנו",
+      "home.team_title": "הצוות שלנו",
+      "home.team_subtitle": "אנשי מקצוע בכירים שמשתלבים בתהליכי העבודה שלכם.",
+      "home.team_all": "הצוות המלא",
+      "home.cta_title": "מוכנים כשאתם מוכנים",
+      "home.cta_lead": "ספרו לנו על המטרות שלכם — נחזור עם הצעדים הבאים והצעה ברורה להיקף העבודה.",
+      "home.cta_quick_title": "הודעה מהירה",
+      "home.cta_full_link": "טופס יצירת קשר מלא ←",
+      "home.hero_placeholder": "תמונת הירו — מוגדרת בלוח הניהול",
+      "form.name": "שם",
+      "form.email": "אימייל",
+      "form.phone": "טלפון (אופציונלי)",
+      "form.message": "הודעה",
+      "form.message_prompt": "איך נוכל לעזור?",
+      "form.attachment": "קובץ מצורף (אופציונלי — תמונות, PDF, Word, עד 5MB)",
+      "form.send": "שליחה",
+      "form.submit": "שליחה",
+      "contact.sent_ok": "תודה — נחזור אליכם בקרוב.",
+      "contact.sent_ok_mini": "נשלח! נחזור אליכם בקרוב.",
+      "contact.error_generic": "משהו השתבש.",
+      "contact.error_network": "שגיאת רשת. נסו שוב.",
+      "about.page_title": "אודותינו",
+      "about.page_lead": "איך אנחנו עובדים, על מה אנחנו מתמקדים, ולמה צוותים בוחרים לעבוד איתנו.",
+      "about.mission_heading": "המשימה",
+      "about.values_heading": "ערכים",
+      "about.work_with_us": "עבדו איתנו",
+      "services.page_title": "שירותים",
+      "services.page_lead": "שירותים מודולריים מהאפיון ועד ההשקה — היקף ברור ותוצאות מדידות.",
+      "team.page_title": "צוות",
+      "team.page_lead": "האנשים שמאחורי העבודה — צוות קטן, בכיר ומשולב עם בעלי העניין שלכם.",
+      "projects.page_title": "פרויקטים ו-micro-SaaS",
+      "projects.page_lead": "עבודות נבחרות וכמה מוצרים פנימיים שבעזרתם אנחנו שומרים על המקצועיות שלנו חדה.",
+      "blog.page_title": "בלוג וחדשות",
+      "blog.page_lead": "הערות על אספקה, מוצר וחיי הסטודיו.",
+      "blog.search_placeholder": "חיפוש פוסטים…",
+      "blog.search": "חיפוש",
+      "blog.all": "הכול",
+      "blog.previous": "הקודם",
+      "blog.next": "הבא",
+      "blog.page_of": "עמוד {page} / {total}",
+      "blog.views": "צפיות",
+      "blog.no_posts": "אין פוסטים התואמים לסינון.",
+      "blog.load_error": "לא ניתן היה לטעון את הפוסטים.",
+      "contact.page_title": "צור קשר",
+      "contact.page_lead": "שתפו הקשר, לוח זמנים ומטרות. נחזור אליכם תוך יומיים עסקיים עם הצעה לצעדים הבאים.",
+      "contact.map": "מפה",
+      "contact.map_note": "ניתן להגדיר את כתובת ההטמעה בלוח הניהול.",
+      "contact.hours": "שעות פעילות",
+      "contact.hours_remote": "עבודה מרחוק בראש ובראשונה, אזורי זמן: אמריקה · האיחוד האירופי",
+      "contact.hours_files": "שיתוף קבצים מאובטח זמין לפי בקשה",
+      "contact.hours_spam": "בלי ספאם — ההודעה שלכם נשארת אצל צוות הליבה שלנו",
+      "contact.form_title": "שלחו הודעה",
+      "service.missing": "השירות חסר.",
+      "service.not_found": "לא נמצא.",
+      "service.back": "חזרה לשירותים",
+      "service.discuss": "בואו נדבר על השירות הזה",
+      "project.missing": "הפרויקט חסר.",
+      "project.not_found": "לא נמצא.",
+      "project.back": "עבודות",
+      "post.missing": "הפוסט חסר.",
+      "post.not_found": "לא נמצא.",
+      "post.back": "בלוג",
+      "nav.back_services": "→ כל השירותים",
+      "nav.back_work": "→ כל העבודות",
+      "nav.back_blog": "→ בלוג",
+      "cookie.text": "אתר זה משתמש בעוגיות לצורכי הפעלה (סשן) וניתוח נתונים.",
+      "cookie.accept": "אישור",
+      "cookie.decline": "דחייה",
+      "cookie.aria": "הסכמה לעוגיות",
+      "newsletter.title": "ניוזלטר",
+      "newsletter.lead": "עדכונים מדי פעם. אפשר לבטל את המנוי בכל עת דרך הקישור במיילים.",
+      "newsletter.subscribe": "הרשמה",
+      "newsletter.email_aria": "אימייל לניוזלטר",
+      "newsletter.pending": "כמעט סיימנו — בדקו את תיבת הדואר ולחצו על קישור האישור.",
+      "home.projects_title_fallback": "פרויקטים",
+      "confirm.title": "אשרו את המנוי שלכם",
+      "confirm.ready": "לחצו על הכפתור כדי לאשר את המנוי שלכם לניוזלטר.",
+      "confirm.button": "אישור המנוי",
+      "confirm.done": "תודה — המנוי שלך אושר.",
+      "confirm.fail": "קישור האישור אינו תקף או שפג תוקפו.",
+      "confirm.note": "קישורי האישור ייחודיים לבקשה שלך ופוקעים לאחר 3 ימים. אם הדף מציג שגיאה, הירשמו שוב דרך הטופס בתחתית האתר.",
+      "unsub.title": "ביטול מנוי לניוזלטר",
+      "unsub.ready": "לחצו על הכפתור כדי לבטל את המנוי לניוזלטר.",
+      "unsub.button": "ביטול מנוי",
+      "unsub.done": "המנוי שלך לניוזלטר בוטל.",
+      "unsub.already": "כבר ביטלת את המנוי.",
+      "unsub.fail": "הקישור אינו תקף או שאינו פעיל עוד.",
+      "unsub.note": "קישורי ביטול המנוי ייחודיים למנוי שלכם. אם הדף מציג שגיאה, השתמשו בקישור מהמייל האחרון שקיבלתם או צרו איתנו קשר.",
+      "token.missing": "חסר אסימון (token) בכתובת. פתחו את הקישור מהמייל.",
+      "contact.err_name": "נא להזין את שמך.",
+      "contact.err_email": "נא להזין כתובת אימייל תקינה.",
+      "contact.err_message": "נא לכתוב הודעה ארוכה יותר.",
+      "contact.err_limit": "יותר מדי בקשות. נסו שוב מאוחר יותר.",
+      "contact.err_unavailable": "טופס יצירת הקשר אינו זמין כרגע.",
+      "contact.err_send": "לא ניתן היה לשלוח את ההודעה. נסו שוב מאוחר יותר.",
+      "contact.err_email_us": "נא לשלוח לנו אימייל לכתובת"
     }
   },
   "defaultLocale": "en",
@@ -2310,7 +2633,7 @@
       "linkUrl": "https://example.com/orbit",
       "featured": 1,
       "sortOrder": 1,
-      "viewCount": 462
+      "viewCount": 474
     },
     {
       "id": 2,
@@ -2421,7 +2744,7 @@
       "metaTitle": "Remote delivery at scale | Nexus Studio",
       "metaDescription": "Practical rituals for distributed teams shipping product and web experiences.",
       "metaKeywords": "remote, delivery, collaboration",
-      "viewCount": 44,
+      "viewCount": 56,
       "categoryName": "News",
       "categorySlug": "news"
     },

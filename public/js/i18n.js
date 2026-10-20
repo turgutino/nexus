@@ -13,6 +13,15 @@
     return s.slice(0, 8) || 'en';
   }
 
+  // Languages written right-to-left: the page direction flips so the whole layout mirrors.
+  const RTL_LOCALES = ['he', 'ar', 'fa', 'ur'];
+
+  function applyDirection(loc) {
+    const root = document.documentElement;
+    root.setAttribute('lang', loc);
+    root.setAttribute('dir', RTL_LOCALES.includes(loc) ? 'rtl' : 'ltr');
+  }
+
   function getLocale() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -32,7 +41,7 @@
     } catch {
       /* private mode */
     }
-    document.documentElement.setAttribute('lang', loc);
+    applyDirection(loc);
     return loc;
   }
 
@@ -106,7 +115,7 @@
 
   async function init() {
     const loc = getLocale();
-    document.documentElement.setAttribute('lang', loc);
+    applyDirection(loc);
     await loadStrings(loc);
     applyDom(document);
     window.dispatchEvent(new Event(I18N_READY_EVENT));

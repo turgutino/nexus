@@ -19,6 +19,7 @@
     { code: "fr", label: "FR", name: "French" },
     { code: "es", label: "ES", name: "Spanish" },
     { code: "de", label: "DE", name: "German" },
+    { code: "he", label: "HE", name: "Hebrew" },
   ];
 
   function getLocale() {
@@ -129,7 +130,7 @@
   }
 
   // Flag file per locale (English is shown with the American flag).
-  const FLAG_FILES = { en: "us", tr: "tr", az: "az", ru: "ru", fr: "fr", es: "es", de: "de" };
+  const FLAG_FILES = { en: "us", tr: "tr", az: "az", ru: "ru", fr: "fr", es: "es", de: "de", he: "il" };
 
   function flagImg(code) {
     const img = document.createElement("img");

@@ -65,3 +65,20 @@ test('translation corrections only touch existing keys and locales', () => {
     assert.equal(getSeedStringsForLocale(f.locale)[f.key], f.to);
   }
 });
+
+test('every language has a flag file and is offered by the language picker', () => {
+  const shell = fs.readFileSync(path.join(publicDir, 'js', 'shell.js'), 'utf8');
+  const flagMap = /const FLAG_FILES = \{([^}]*)\}/.exec(shell)[1];
+  for (const loc of I18N_LOCALES) {
+    const m = new RegExp('(?:^|[ ,])' + loc + ': *"([a-z]+)"').exec(flagMap);
+    assert.ok(m, `no flag mapped for ${loc}`);
+    assert.ok(fs.existsSync(path.join(publicDir, 'img', 'flags', m[1] + '.svg')), `missing flag file for ${loc}`);
+    assert.ok(shell.includes(`code: "${loc}"`), `${loc} is not in LANG_OPTIONS`);
+  }
+});
+
+test('right-to-left languages flip the page direction', () => {
+  const i18n = fs.readFileSync(path.join(publicDir, 'js', 'i18n.js'), 'utf8');
+  assert.ok(/RTL_LOCALES = \[[^\]]*'he'/.test(i18n));
+  assert.ok(i18n.includes("'dir'"));
+});

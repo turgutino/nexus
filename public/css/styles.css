@@ -31,6 +31,7 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: clip; /* decorative glows bleed past the viewport edge without creating a horizontal scrollbar */
   font-family: var(--font);
   background: radial-gradient(1200px 800px at 10% -10%, rgba(56, 189, 248, 0.12), transparent),
     radial-gradient(900px 600px at 90% 20%, rgba(129, 140, 248, 0.12), transparent),
@@ -792,7 +793,7 @@ select {
 }
 
 .list-check li {
-  padding-left: 1.5rem;
+  padding-inline-start: 1.5rem;
   position: relative;
   margin-bottom: 0.5rem;
   color: var(--muted);
@@ -801,7 +802,7 @@ select {
 .list-check li::before {
   content: "";
   position: absolute;
-  left: 0;
+  inset-inline-start: 0;
   top: 0.55em;
   width: 8px;
   height: 8px;
@@ -850,7 +851,7 @@ select {
   position: relative;
   display: inline-flex;
   align-items: center;
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
 }
 
 /* Round flag button + round flag menu (no text) */
@@ -894,7 +895,7 @@ select {
 .lang-menu {
   position: absolute;
   top: calc(100% + 0.5rem);
-  right: 0;
+  inset-inline-end: 0;
   z-index: 60;
   display: flex;
   flex-direction: column;
@@ -1060,4 +1061,21 @@ select {
     flex: 1;
     min-width: 0;
   }
+}
+
+/* Right-to-left languages (Hebrew) */
+:lang(he) {
+  font-family: "Heebo", var(--font);
+}
+
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="tel"],
+[dir="rtl"] input[type="url"] {
+  direction: ltr;
+  text-align: right;
+}
+
+/* Content written in another language (e.g. English cards on a Hebrew page) keeps its own reading direction */
+[dir="rtl"] main :is(p, h1, h2, h3, h4, li, .post-meta) {
+  unicode-bidi: plaintext;
 }
