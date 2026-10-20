@@ -83,3 +83,6 @@ docker-compose.override.yml
 
 # Misc
 .eslintcache
+
+# Static site build output
+dist-static/

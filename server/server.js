@@ -696,10 +696,13 @@ app.get(
       [slug]
     );
     if (!row) return res.status(404).json({ ok: false, error: 'Not found' });
-    await query(`UPDATE projects SET view_count = view_count + 1, updated_at = NOW() WHERE id = ?`, [
-      row.id,
-    ]);
-    row.view_count += 1;
+    // The static-site export reads content without inflating view counts.
+    if (req.get('x-static-export') !== '1') {
+      await query(`UPDATE projects SET view_count = view_count + 1, updated_at = NOW() WHERE id = ?`, [
+        row.id,
+      ]);
+      row.view_count += 1;
+    }
     res.json({ ok: true, project: projectRowPublic(row) });
   })
 );
@@ -782,10 +785,12 @@ app.get(
       [slug]
     );
     if (!row) return res.status(404).json({ ok: false, error: 'Not found' });
-    await query(`UPDATE blog_posts SET view_count = view_count + 1, updated_at = NOW() WHERE id = ?`, [
-      row.id,
-    ]);
-    row.viewCount = Number(row.viewCount || 0) + 1;
+    if (req.get('x-static-export') !== '1') {
+      await query(`UPDATE blog_posts SET view_count = view_count + 1, updated_at = NOW() WHERE id = ?`, [
+        row.id,
+      ]);
+      row.viewCount = Number(row.viewCount || 0) + 1;
+    }
     res.json({ ok: true, post: row });
   })
 );

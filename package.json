@@ -10,7 +10,9 @@
     "check": "node scripts/check-syntax.js",
     "admin:reset-password": "node server/scripts/reset-admin.js",
     "admin:disable-2fa": "node server/scripts/reset-admin.js --disable-2fa",
-    "import:sqlite": "node server/scripts/sqlite-to-postgres.js"
+    "import:sqlite": "node server/scripts/sqlite-to-postgres.js",
+    "export:data": "node scripts/export-data.js",
+    "build:static": "node scripts/build-static.js"
   },
   "engines": {
     "node": ">=18"

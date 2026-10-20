@@ -242,7 +242,8 @@ This repository does **not** include a `LICENSE` file. All rights may be reserve
 
 ## Deploying
 
-Step-by-step guide for a free VPS with automatic HTTPS: see **[DEPLOY.md](DEPLOY.md)** (`docker-compose.prod.yml`, `deploy/Caddyfile`, `deploy/backup.sh`).
+- **Free, no server (read-only copy of the public pages):** [DEPLOY-GITHUB-PAGES.md](DEPLOY-GITHUB-PAGES.md) — GitHub Pages or Vercel, built from `static/site-data.json`.
+- **Full site with admin panel on a VPS with automatic HTTPS:** [DEPLOY.md](DEPLOY.md) (`docker-compose.prod.yml`, `deploy/Caddyfile`, `deploy/backup.sh`).
 
 ## Security and production checklist
 

@@ -1,0 +1,59 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const lib = require('../scripts/lib/static-build');
+
+test('normalizeBase', () => {
+  assert.equal(lib.normalizeBase(''), '');
+  assert.equal(lib.normalizeBase('/'), '');
+  assert.equal(lib.normalizeBase('Company-site'), '/Company-site');
+  assert.equal(lib.normalizeBase('/Company-site/'), '/Company-site');
+  assert.equal(lib.normalizeBase('C:/Program Files/Git/Company-site'), '/Company-site');
+  assert.equal(lib.normalizeBase('/C:/Program Files/Git/Company-site'), '/Company-site');
+});
+
+test('rewriteAssetPaths prefixes site paths but not api, external or protocol-relative URLs', () => {
+  const b = '/Company-site';
+  const src = `<link href="/css/styles.css"><a href="/contact.html">x</a><script src="/js/a.js"></script>
+    fetch("/api/public/site"); "//cdn.example/x.js"; "https://x.example/css/a.css"; url(/uploads/a.png) \`/blog.html?\${p}\``;
+  const out = lib.rewriteAssetPaths(src, b);
+  assert.ok(out.includes('href="/Company-site/css/styles.css"'));
+  assert.ok(out.includes('href="/Company-site/contact.html"'));
+  assert.ok(out.includes('src="/Company-site/js/a.js"'));
+  assert.ok(out.includes('url(/Company-site/uploads/a.png)'));
+  assert.ok(out.includes('`/Company-site/blog.html?'));
+  assert.ok(out.includes('fetch("/api/public/site")'));
+  assert.ok(out.includes('"//cdn.example/x.js"'));
+  assert.ok(out.includes('"https://x.example/css/a.css"'));
+  assert.equal(lib.rewriteAssetPaths(src, ''), src);
+});
+
+test('prefixDeep only touches path-like strings', () => {
+  const out = lib.prefixDeep(
+    { image: '/uploads/a.png', link: '/services.html', text: '/ not a path', ext: 'https://a.example', arr: ['/about.html', 'x'] },
+    '/Company-site'
+  );
+  assert.equal(out.image, '/Company-site/uploads/a.png');
+  assert.equal(out.link, '/Company-site/services.html');
+  assert.equal(out.text, '/ not a path');
+  assert.equal(out.ext, 'https://a.example');
+  assert.deepEqual(out.arr, ['/Company-site/about.html', 'x']);
+});
+
+test('transformHtml injects the shim before the first script and escapes config', () => {
+  const html = '<html><head></head><body><script src="/js/i18n.js"></script></body></html>';
+  const out = lib.transformHtml(html, '/Company-site', { contactEmail: '</script><b>' });
+  assert.ok(out.indexOf('static-shim.js') < out.indexOf('i18n.js'));
+  assert.ok(!out.includes('</script><b>'));
+  assert.ok(out.includes('src="/Company-site/js/i18n.js"'));
+  assert.ok(out.includes('footer-newsletter'));
+});
+
+test('pathname usage is redirected through the shim', () => {
+  assert.equal(lib.rewritePathnameUsage('var p = window.location.pathname;'), 'var p = window.__pagePath();');
+});
+
+test('sitemap escapes and uses the site url', () => {
+  const xml = lib.buildSitemap('https://x.example/app/', { posts: ['a&b'] });
+  assert.ok(xml.includes('<loc>https://x.example/app/</loc>'));
+  assert.ok(xml.includes('post.html?slug=a%26b'));
+});
