@@ -7,7 +7,7 @@ switcher. Content is exported once from the running site into `static/site-data.
 **What does not exist on the static site:** the admin panel, newsletter signup, analytics, file attachments on the contact form.
 To change content you edit it in the admin panel of your local copy, export again and push (steps below).
 
-The address will be `https://<github-username>.github.io/<repository-name>/` (e.g. `https://turgutino.github.io/Company-site/`).
+The address will be `https://<github-username>.github.io/<repository-name>/` (e.g. `https://turgutino.github.io/nexus/`).
 Pages is free for **public** repositories.
 
 > **Before the first publish:** the site currently shows the demo content that ships with the project
@@ -21,7 +21,7 @@ Pages is free for **public** repositories.
    then edit `static/config.json`:
    ```json
    {
-     "siteUrl": "https://turgutino.github.io/Company-site",
+     "siteUrl": "https://turgutino.github.io/nexus",
      "contactEndpoint": "https://formspree.io/f/abcdwxyz",
      "contactExtraFields": {},
      "contactEmail": "you@example.com"
@@ -60,6 +60,6 @@ Vercel serves from the root, so no base path is needed.
 
 ## Good to know
 
-- The build rewrites links so the site works under `/<repository-name>/`; `--base` controls this (`node scripts/build-static.js --base /Company-site`).
+- The build rewrites links so the site works under `/<repository-name>/`; `--base` controls this (`node scripts/build-static.js --base /nexus`).
   On Windows Git Bash a leading `/` argument is rewritten by the shell; the script repairs that, or use PowerShell.
 - The Docker/VPS deployment (`DEPLOY.md`) is unaffected and remains available if you later need the admin panel online.

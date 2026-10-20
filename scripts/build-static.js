@@ -1,7 +1,7 @@
 /**
  * Builds the static site (no server needed) into ./dist-static.
  *
- *   node scripts/build-static.js [--base /Company-site] [--out dist-static]
+ *   node scripts/build-static.js [--base /nexus] [--out dist-static]
  *
  *   --base   URL path the site is served under. GitHub *project* pages live under "/<repo-name>";
  *            use "" (default) for a user/organisation page, a custom domain, or Vercel.

@@ -47,7 +47,7 @@ ssh -i path/to/oracle-private.key ubuntu@SERVER_IP
 ## 5. Prepare the server (once)
 
 ```bash
-git clone https://github.com/turgutino/Company-site.git ~/company-site
+git clone https://github.com/turgutino/nexus.git ~/company-site
 cd ~/company-site
 bash deploy/server-setup.sh
 ```
